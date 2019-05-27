@@ -13,10 +13,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        // Seed Users
         DB::table('core_users')->truncate();
-
         $this->call([UsersTableSeeder::class]);
         factory(User::class, 50)->create();
+
+        // Seed Permissions
+        DB::table('core_permissions')->truncate();
+        $this->call([CorePermissionsTableSeeder::class]);
+
 //        $this->call(CommentsTableSeeder::class);
 //        $this->call(CorePermissionsTableSeeder::class);
 //        $this->call(CorePermissionRoleTableSeeder::class);
