@@ -8,7 +8,14 @@ $factory->define(User::class, function (Faker $faker) {
         'first_name' => $faker->firstName(),
         'last_name' => $faker->lastName(),
         'email' => $faker->unique()->safeEmail,
-        'password' => bcrypt('Password1'),
+        'password' => bcrypt('password'),
         'remember_token' => str_random(10),
+        'username' => $faker->unique()->userName,
+        'gender' => $faker->randomElement(['male', 'female']),
+        'contact_number' => $faker->phoneNumber,
+        'verified' => $faker->boolean(90),
+        'is_active' => $faker->boolean(90),
+        'created_at' => date("Y-m-d H:i:s"),
+        'updated_at' => date("Y-m-d H:i:s"),
     ];
 });

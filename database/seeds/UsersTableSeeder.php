@@ -11,16 +11,19 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('users')->insert(array(
+        DB::table('core_users')->insert(array(
             array(
-                'account_id' => 1,
-                'name' => 'Ramesh Maharjan',
-                'email' => 'maharjanrams@gmail.com',
-                'password' => bcrypt('newmoon123'),
-                'remember_token' => null,
+                'first_name' => 'Sudip',
+                'last_name' => 'Limbu',
+                'email' => 'sudip@gmail.com',
+                'username' => 'sudip',
+                'gender' => 'male',
+                'contact_number' => '92839238',
+                'password' => bcrypt('password'),
+                'verified' => 1,
+                'is_active' => 1,
                 'created_at' => date("Y-m-d H:i:s"),
                 'updated_at' => date("Y-m-d H:i:s"),
-                'verified' => 1,
             ),
         ));
 
