@@ -1,6 +1,5 @@
 <?php
 
-use App\Acme\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -13,23 +12,31 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // Seed Users
-        DB::table('core_users')->truncate();
-        $this->call([UsersTableSeeder::class]);
-        factory(User::class, 50)->create();
-
+        //==========Roles and Permissions==========
         // Seed Permissions
-        DB::table('core_permissions')->truncate();
         $this->call([CorePermissionsTableSeeder::class]);
 
-//        $this->call(CommentsTableSeeder::class);
-//        $this->call(CorePermissionsTableSeeder::class);
-//        $this->call(CorePermissionRoleTableSeeder::class);
-//        $this->call(CoreRolesTableSeeder::class);
-//        $this->call(CoreRoleUserTableSeeder::class);
-//        $this->call(CoreUsersTableSeeder::class);
-//        $this->call(MediaTableSeeder::class);
-//        $this->call(PasswordResetsTableSeeder::class);
-//        $this->call(PostsTableSeeder::class);
+        // Seed Roles
+        $this->call([CoreRolesTableSeeder::class]);
+
+        // Seed Roles Permissions
+        $this->call([CorePermissionRoleTableSeeder::class]);
+
+        //===========User and Roles ===============
+        // Seed Users
+        $this->call([UsersTableSeeder::class]);
+
+        // Seed User Roles
+        $this->call([CoreRoleUserTableSeeder::class]);
+
+        //===============Settings==================
+        // Seed Settings
+        $this->call(SettingsTableSeeder::class);
+
+        //===============Lottery===================
+        // Seed Lottery Winner Types
+        $this->call(LotteryWinnerTypesTableSeeder::class);
+
+        //===============Wallet====================
     }
 }

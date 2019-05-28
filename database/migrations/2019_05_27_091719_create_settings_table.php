@@ -15,8 +15,8 @@ class CreateSettingsTable extends Migration {
 		Schema::create('settings', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->enum('scope', ['everywhere', 'frontend', 'backend', 'user', 'wallet', 'lottery', 'page'])->index();
-			$table->string('key')->index();
+			$table->string('key')->unique();
+			$table->string('label');
 			$table->string('value');
 			$table->enum('field', ['text', 'textarea', 'select', 'radio']);
 			$table->string('field_value', 191)->default('')->comment('for select, radio');

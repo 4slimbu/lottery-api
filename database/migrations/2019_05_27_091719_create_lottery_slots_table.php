@@ -17,7 +17,9 @@ class CreateLotterySlotsTable extends Migration {
 			$table->increments('id');
             $table->timestamp('start_time')->nullable();
 			$table->timestamp('end_time')->nullable();
-			$table->string('winning_combination')->nullable();
+			$table->boolean('has_winner')->default(0);
+			$table->integer('total_participants')->unsigned()->default(0);
+			$table->string('total_amount')->default('0');
 			$table->boolean('status')->default(0);
 			$table->timestamps();
 		});

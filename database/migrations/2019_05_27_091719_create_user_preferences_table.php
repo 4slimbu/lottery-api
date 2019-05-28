@@ -16,7 +16,7 @@ class CreateUserPreferencesTable extends Migration {
 		{
 			$table->increments('id');
 			$table->integer('user_id')->unsigned()->nullable()->index('user_id');
-			$table->string('key');
+			$table->string('key')->index('user_pref_key')->comment('e.g: subscriptionTypes');
             $table->text('data')->nullable();
 			$table->timestamps();
 		});

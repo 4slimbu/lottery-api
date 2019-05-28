@@ -16,10 +16,10 @@ class CreateWalletsTable extends Migration {
 		{
 			$table->increments('id');
 			$table->integer('user_id')->unsigned()->index('user_id');
-			$table->string('deposited_amount');
-			$table->string('won_amount');
-			$table->string('pending_withdraw_amount');
-			$table->string('amount');
+			$table->string('top_up_amount')->comment('Cannot be withdrawn but can be used to play');
+			$table->string('pending_withdraw_amount')->comment('Amount that has been requested to withdrawn');
+			$table->string('current_amount')->comment('Usable amount: excludes withdraw pending amount');
+			$table->string('total_amount')->comment('current_amount + pending_withdraw_amount');
 			$table->timestamps();
 		});
 	}

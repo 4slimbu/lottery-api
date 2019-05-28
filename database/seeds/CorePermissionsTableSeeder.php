@@ -13,6 +13,8 @@ class CorePermissionsTableSeeder extends Seeder
      */
     public function run()
     {
+        DB::table('core_permissions')->truncate();
+
         DB::table('core_permissions')->insert([
             [
                 'name' => 'read_users',
@@ -83,6 +85,24 @@ class CorePermissionsTableSeeder extends Seeder
             [
                 'name' => 'delete_roles_and_permissions',
                 'label' => 'Delete Roles and Permissions',
+                'created_at' => date("Y-m-d H:i:s"),
+                'updated_at' => date("Y-m-d H:i:s"),
+            ],
+            [
+                'name' => 'read_self',
+                'label' => 'Read Self',
+                'created_at' => date("Y-m-d H:i:s"),
+                'updated_at' => date("Y-m-d H:i:s"),
+            ],
+            [
+                'name' => 'edit_self',
+                'label' => 'Edit Self',
+                'created_at' => date("Y-m-d H:i:s"),
+                'updated_at' => date("Y-m-d H:i:s"),
+            ],
+            [
+                'name' => 'delete_self',
+                'label' => 'Delete Self',
                 'created_at' => date("Y-m-d H:i:s"),
                 'updated_at' => date("Y-m-d H:i:s"),
             ]

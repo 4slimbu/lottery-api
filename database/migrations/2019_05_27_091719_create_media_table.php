@@ -16,8 +16,8 @@ class CreateMediaTable extends Migration {
 		{
 			$table->increments('id');
 			$table->boolean('is_primary')->nullable()->default(0)->comment('Set to true to set asset to be the primary/default asset i.e default posert logo would be 1 here');
-			$table->integer('post_id')->unsigned()->nullable()->index('brand_id');
-			$table->integer('user_id')->unsigned()->nullable()->index('user_id');
+			$table->integer('page_id')->unsigned()->nullable();
+			$table->integer('user_id')->unsigned()->nullable();
 			$table->string('url')->default('')->comment('URL or URL key of asset');
 			$table->timestamps();
 		});

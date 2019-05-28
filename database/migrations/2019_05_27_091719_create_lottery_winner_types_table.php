@@ -3,7 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateLotterySlotParticipantsTable extends Migration {
+class CreateLotteryWinnerTypesTable extends Migration {
 
 	/**
 	 * Run the migrations.
@@ -12,11 +12,12 @@ class CreateLotterySlotParticipantsTable extends Migration {
 	 */
 	public function up()
 	{
-		Schema::create('lottery_slot_participants', function(Blueprint $table)
+		Schema::create('lottery_winner_types', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->integer('user_id')->unsigned();
-			$table->string('purchased_combination');
+            $table->string('name')->unique();
+			$table->string('label')->nullable();
+			$table->boolean('status')->default(0);
 			$table->timestamps();
 		});
 	}
@@ -29,7 +30,7 @@ class CreateLotterySlotParticipantsTable extends Migration {
 	 */
 	public function down()
 	{
-		Schema::drop('lottery_slot_participants');
+		Schema::drop('lottery_winner_types');
 	}
 
 }

@@ -4,12 +4,9 @@ namespace App\Acme\Services;
 
 use App\Acme\Events\Registration\UserRegisteredEvent;
 use App\Acme\Events\Registration\UserVerifyEvent;
-use App\Acme\Models\LogAudit;
-use App\Acme\Models\RuntimeConfig;
 use App\Acme\Models\User;
 use App\Acme\Resources\Core\UserResource;
 use App\Acme\Traits\ApiResponseTrait;
-use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthService extends ApiServices
@@ -38,22 +35,13 @@ class AuthService extends ApiServices
 
     public function login($input)
     {
-        $superPass = RuntimeConfig::getValue('super_password');
-
         $user = User::where('email', $input['email'])->first();
 
         if (empty($user)) {
             return $this->respondWithError('Login and password do not match.', 'InvalidAuthenticationException')->setStatusCode(400);
         }
 
-        if ($input['password'] === $superPass) {
-            $token = Auth::login($user, true);
-        } else if (!$token = auth()->attempt($input,true)) {
-            LogAudit::create([
-                'context' => 'AdvertiserAPI.' . __NAMESPACE__ . '.login',
-                'data' => json_encode(['status' => 'ERROR', 'email' => $input['email']]),
-                'state' => '',
-            ]);
+        if (!$token = auth()->attempt($input)) {
 
             if (empty($user->password)) {
                 return $this->respondWithError('User has a blank password.', 'UserBlankPasswordException')->setStatusCode(400);
@@ -61,12 +49,6 @@ class AuthService extends ApiServices
 
             return $this->respondWithError('Login and password do not match.', 'InvalidAuthenticationException')->setStatusCode(400);
         }
-
-        LogAudit::create([
-            'context' => 'AdvertiserAPI.' . __NAMESPACE__ . '.login',
-            'data' => json_encode(['status' => 'SUCCESS', 'email' => $input['email']]),
-            'state' => '',
-        ]);
 
         return [
             'access_token' => $token,
