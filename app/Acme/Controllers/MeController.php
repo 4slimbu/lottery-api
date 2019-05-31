@@ -33,7 +33,7 @@ class MeController extends ApiController
 
             $p = Storage::disk('s3')->put('profile/' . $imageName, $input['profile_pic'], 'public');
 
-            $filePath =  'https://s3-' . config('filesystems.disks.s3.region') . '.amazonaws.com/loksewa/profile/' . $imageName;
+            $filePath =  'https://s3-' . config('filesystems.disks.s3.region') . '.amazonaws.com/lottery/profile/' . $imageName;
 
             $input['profile_pic'] = $filePath;
         }

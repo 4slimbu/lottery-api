@@ -74,7 +74,7 @@ class AuthController extends ApiController
         $p = Storage::disk('s3')->put('profile/' . $imageName, $image, 'public');
 //        $image_url = Storage::disk()->url($imageName);
 
-        $filePath =  'https://s3-' . config('filesystems.disks.s3.region') . '.amazonaws.com/loksewa/profile/' . $imageName;
+        $filePath =  'https://s3-' . config('filesystems.disks.s3.region') . '.amazonaws.com/lottery/profile/' . $imageName;
 
         // Prepare register inputs
         $input = [
@@ -95,7 +95,7 @@ class AuthController extends ApiController
 
             $token = Auth::login($user, true);
             return [
-                'access_token' => $token,
+                'token' => $token,
                 'token_type' => 'bearer',
                 'expires_in' => auth()->factory()->getTTL() * 60,
                 'user' => new UserResource(auth()->user()),
@@ -117,6 +117,10 @@ class AuthController extends ApiController
         return $this->userService->forgotUserPassword($input);
     }
 
+    /**
+     * @param UserResetPasswordRequest $request
+     * @return $this
+     */
     public function resetPassword(UserResetPasswordRequest $request)
     {
         $input = $request->getInput();

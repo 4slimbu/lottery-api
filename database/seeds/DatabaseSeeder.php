@@ -38,5 +38,10 @@ class DatabaseSeeder extends Seeder
         $this->call(LotteryWinnerTypesTableSeeder::class);
 
         //===============Wallet====================
+
+        // User registers
+        // Top up wallet
+        // Play lottery
+        //
     }
 }

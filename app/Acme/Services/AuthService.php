@@ -29,6 +29,9 @@ class AuthService extends ApiServices
         $input['email_token'] = str_limit( md5($input['email']. str_random()), 8, '');
         $user = User::create($input);
 
+        // Assign player role to new user user
+        $user->roles()->sync(3);
+
         event(new UserRegisteredEvent($user));
         return $this->login($loginInput);
     }
@@ -51,7 +54,7 @@ class AuthService extends ApiServices
         }
 
         return [
-            'access_token' => $token,
+            'token' => $token,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60,
             'user' => new UserResource(auth()->user()),
@@ -69,7 +72,7 @@ class AuthService extends ApiServices
         $newToken = JWTAuth::refresh($oldToken);
 
         return [
-            'access_token' => $newToken,
+            'token' => $newToken,
             'token_type' => 'bearer',
             'expires_in' => auth()->factory()->getTTL() * 60,
             'user' => new UserResource(auth()->user()),

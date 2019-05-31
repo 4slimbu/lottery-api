@@ -2,13 +2,13 @@
 
 namespace App\Acme\Models;
 
-use App\Acme\Traits\JobTrait;
+use App\Acme\Traits\PermissionTrait;
 use Illuminate\Database\Eloquent\Model;
 
 class Post extends Model
 {
     protected $table = 'posts';
-    static public $POST_IMAGES_AWS_PATH = 'loksewa/{userId}/{postId}';
+    static public $POST_IMAGES_AWS_PATH = 'lottery/{userId}/{postId}';
 
     /**
      * The attributes that are mass assignable.

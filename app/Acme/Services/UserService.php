@@ -9,27 +9,30 @@ use App\Acme\Models\User;
 use App\Acme\Models\UserEmailReset;
 use App\Acme\Resources\Core\UserResource;
 use App\Acme\Traits\ApiResponseTrait;
+use App\Acme\Traits\PermissionTrait;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
 
 class UserService extends ApiServices
 {
-    use ApiResponseTrait;
+    use ApiResponseTrait, PermissionTrait;
 
-    public function getUsers($input, $user)
+    public function getUsers($input)
     {
-        if (!$user->can('getUsers')) {
+        if (! $this->currentUserCan('getUsers')) {
             return $this->respondWithNotAllowed();
         }
 
-        $users = User::filter($input)->paginate($input['limit'] ?? 15);
+        $query = User::with('roles')->filter($input);
+
+        $users = $query->paginate($input['limit'] ?? 15);
         return UserResource::collection($users);
     }
 
-    public function createUser($input, $user)
+    public function createUser($input)
     {
-        if (!$user->can('createUser')) {
+        if (! $this->currentUserCan('createUser')) {
             return $this->respondWithNotAllowed();
         }
 
@@ -50,7 +53,7 @@ class UserService extends ApiServices
 
     public function showUser($input, $user)
     {
-        if (!$user->can('getUser')) {
+        if (!$this->currentUserCan('getUser')) {
             return $this->respondWithNotAllowed();
         }
 
@@ -60,7 +63,7 @@ class UserService extends ApiServices
 
     public function updateUser($input, $user)
     {
-        if (!$user->can('updateUser')) {
+        if (!$this->currentUserCan('updateUser')) {
             return $this->respondWithNotAllowed();
         }
 
@@ -80,7 +83,7 @@ class UserService extends ApiServices
 
     public function destroyUser($input, $user)
     {
-        if (!$user->can('destroyUser')) {
+        if (!$this->currentUserCan('destroyUser')) {
             return $this->respondWithNotAllowed();
         }
 

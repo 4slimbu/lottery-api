@@ -29,7 +29,7 @@ class CorePermissionRoleTableSeeder extends Seeder
         // Seed permissions for Admin
         $admin = DB::table('core_roles')->select('id')->where('name', 'admin')->first();
         $adminPermissions = DB::table('core_permissions')->select('id')->whereNotIn('name', [
-            'read_roles_and_permissions', 'edit_roles_and_permissions', 'delete_roles_and_permissions'
+            'getPermissions', 'createPermission', 'updatePermission', 'destroyPermission'
         ])->get();
 
         foreach ($adminPermissions as $permission) {

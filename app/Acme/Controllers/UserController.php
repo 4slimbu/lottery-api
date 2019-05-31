@@ -20,8 +20,7 @@ class UserController extends ApiController
     public function index(UserGetRequest $request)
     {
         $input = $request->getFilter();
-        $user = auth()->user();
-        return $this->userService->getUsers($input, $user);
+        return $this->userService->getUsers($input);
     }
 
     public function create(UserCreateRequest $request)

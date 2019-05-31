@@ -23,8 +23,8 @@ class UserResource extends JsonResource
             'contact_number' => (string)$this->contact_number,
             'email' => (string)$this->email,
             'verified' => (bool)$this->verified,
-            'preferences' => (object)$this->preferences,
             'profile_pic' => (string)$this->profile_pic,
+            'is_active' => (bool)$this->is_active,
             'roles' => RoleResource::collection($this->whenLoaded('roles')),
         ];
     }

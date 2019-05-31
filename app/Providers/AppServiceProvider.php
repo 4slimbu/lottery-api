@@ -13,9 +13,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        if (extension_loaded('newrelic')) {
-            newrelic_set_appname(config('app.name') . ' [' . config('app.env') . ']');
-        }
+        \DB::enableQueryLog();
     }
 
     /**

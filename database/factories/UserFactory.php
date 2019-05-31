@@ -13,6 +13,7 @@ $factory->define(User::class, function (Faker $faker) {
         'username' => $faker->unique()->userName,
         'gender' => $faker->randomElement(['male', 'female']),
         'contact_number' => $faker->phoneNumber,
+        'profile_pic' => $faker->imageUrl($width = 100, $height = 100),
         'verified' => $faker->boolean(90),
         'is_active' => $faker->boolean(90),
         'created_at' => date("Y-m-d H:i:s"),

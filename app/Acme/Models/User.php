@@ -3,6 +3,7 @@
 namespace App\Acme\Models;
 
 use App\Acme\Models\Core\CoreProduct;
+use App\Acme\Resources\Core\UserResource;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -18,7 +19,8 @@ class User extends Authenticatable implements JWTSubject
     ];
 
     protected $fillable = [
-        'id', 'first_name', 'last_name', 'gender', 'contact_number', 'email', 'preferences', 'password', 'verified', 'email_token',
+        'id', 'first_name', 'last_name', 'gender', 'contact_number', 'email',
+        'password', 'verified', 'email_token',
         'profile_pic', 'fb_id', 'device_id'
     ];
 
@@ -41,7 +43,11 @@ class User extends Authenticatable implements JWTSubject
 
     public function getJWTCustomClaims()
     {
-        return [];
+        return [
+            "user" => new UserResource($this),
+            // Assuming user can only have one role at the moment
+            "permissions" => $this->roles()->first()->permissions->pluck('name'),
+        ];
     }
 
     public function verified()
@@ -117,4 +123,5 @@ class User extends Authenticatable implements JWTSubject
 
         return $query;
     }
+
 }
