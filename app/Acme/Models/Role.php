@@ -17,4 +17,16 @@ class Role extends Model
     {
         return $this->permissions()->save($permission);
     }
+
+    public function scopeFilter($query, $params)
+    {
+        if (!empty($params['name'])) {
+            $query = $query->where(function($q) use ($params) {
+                $q->where('name', 'LIKE', '%' . $params['name'] . '%');
+            });
+        }
+
+        return $query;
+    }
+
 }
