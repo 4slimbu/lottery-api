@@ -34,6 +34,8 @@ class UserGetRequest extends ApiRequest
             'orderBy' => $this->get('orderBy', null),
             'full_name' => $this->get('full_name', null),
             'email' => $this->get('email', null),
+            'roles' => $this->get('roles', null),
+            'is_active' => $this->get('is_active', null)
         ];
     }
 }

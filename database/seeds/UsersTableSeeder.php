@@ -12,6 +12,7 @@ class UsersTableSeeder extends Seeder
      */
     public function run()
     {
+
         $faker = Faker\Factory::create();
 
         DB::table('core_users')->truncate();
@@ -27,7 +28,7 @@ class UsersTableSeeder extends Seeder
                 'password' => bcrypt('password'),
                 'verified' => 1,
                 'is_active' => 1,
-                'profile_pic' => $faker->imageUrl($width = 100, $height = 100),
+                'profile_pic' => $this->imagePublicUrl($faker->image(public_path() .'/images/profiles', $width = 100, $height = 100)),
                 'created_at' => date("Y-m-d H:i:s"),
                 'updated_at' => date("Y-m-d H:i:s"),
             ],
@@ -41,7 +42,7 @@ class UsersTableSeeder extends Seeder
                 'password' => bcrypt('password'),
                 'verified' => 1,
                 'is_active' => 1,
-                'profile_pic' => $faker->imageUrl($width = 100, $height = 100),
+                'profile_pic' => $this->imagePublicUrl($faker->image(public_path() . '/images/profiles', $width = 100, $height = 100)),
                 'created_at' => date("Y-m-d H:i:s"),
                 'updated_at' => date("Y-m-d H:i:s"),
             ],
@@ -55,7 +56,7 @@ class UsersTableSeeder extends Seeder
                 'password' => bcrypt('password'),
                 'verified' => 1,
                 'is_active' => 1,
-                'profile_pic' => $faker->imageUrl($width = 100, $height = 100),
+                'profile_pic' => $this->imagePublicUrl($faker->image(public_path() . '/images/profiles', $width = 100, $height = 100)),
                 'created_at' => date("Y-m-d H:i:s"),
                 'updated_at' => date("Y-m-d H:i:s"),
             ]
@@ -63,5 +64,13 @@ class UsersTableSeeder extends Seeder
 
         // Add extra random users
         factory(User::class, 50)->create();
+    }
+
+    public function imagePublicUrl($filepath)
+    {
+        $splittedImageUrl = explode('\\', $filepath);
+        $imageUrl = url('/images/profiles/' . $splittedImageUrl[count($splittedImageUrl) - 1]);
+
+        return $imageUrl;
     }
 }

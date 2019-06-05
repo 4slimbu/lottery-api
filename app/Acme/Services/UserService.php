@@ -61,7 +61,7 @@ class UserService extends ApiServices
         return new UserResource($user);
     }
 
-    public function updateUser($input, $user)
+    public function updateUser($input)
     {
         if (!$this->currentUserCan('updateUser')) {
             return $this->respondWithNotAllowed();
@@ -81,7 +81,24 @@ class UserService extends ApiServices
         return new UserResource($user->fresh());
     }
 
-    public function destroyUser($input, $user)
+    public function updateMultipleUser($input)
+    {
+        if (!$this->currentUserCan('updateUser')) {
+            return $this->respondWithNotAllowed();
+        }
+
+        $userIds = $input['user_ids'];
+        unset($input['user_ids']);
+
+        if (!empty($input['new_password'])) {
+            $input['password'] = bcrypt($input['new_password']);
+            unset($input['new_password']);
+        }
+
+        User::whereIn('id', $userIds)->update($input);
+    }
+
+    public function destroyUser($input)
     {
         if (!$this->currentUserCan('destroyUser')) {
             return $this->respondWithNotAllowed();
@@ -89,6 +106,15 @@ class UserService extends ApiServices
 
         $user = User::findOrFail($input['user_id']);
         $user->delete();
+    }
+
+    public function destroyMultipleUser($input)
+    {
+        if (!$this->currentUserCan('destroyUser')) {
+            return $this->respondWithNotAllowed();
+        }
+
+        User::whereIn('id', $input['user_ids'])->delete();
     }
 
     public function checkEmail($input)

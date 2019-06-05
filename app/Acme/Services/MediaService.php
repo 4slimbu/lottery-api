@@ -9,6 +9,16 @@ class MediaService extends ApiServices
 
     private $brandMediaTypeId = 6;
 
+    public function saveImage($file, $baseLocation)
+    {
+
+    }
+
+    public function destroyImage($file, $baseLocation)
+    {
+
+    }
+
     public function getUserMediaForBrand($input)
     {
         //select * from core_media where (brand_id=4622  and  media_type_id = 1) or (media_type_id = 6 and user_id = 412)

@@ -2,7 +2,7 @@
 
 namespace App\Acme\Requests;
 
-class UserUpdateRequest extends ApiRequest
+class UserDestroyRequest extends ApiRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,11 +22,6 @@ class UserUpdateRequest extends ApiRequest
     public function rules()
     {
         return [
-            'first_name' => 'string',
-            'last_name' => 'string',
-            'account_id' => 'integer',
-            'new_password' => 'string|nullable',
-            'is_active' => 'integer',
             'user_ids' => 'array'
         ];
     }

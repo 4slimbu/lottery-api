@@ -16,6 +16,8 @@ Route::prefix('v1')->namespace('\App\Acme\Controllers')->group(function() {
     Route::post('users', 'UserController@create');
     Route::get('users/{userId}', 'UserController@show')->where('userId', '[0-9]+');
     Route::put('users/{userId}', 'UserController@update')->where('userId', '[0-9]+');
+    Route::put('users', 'UserController@updateMultiple');
+    Route::delete('users', 'UserController@destroyMultiple');
     Route::delete('users/{userId}', 'UserController@destroy')->where('userId', '[0-9]+');
     Route::get('users/check-email', 'UserController@checkEmail');
 

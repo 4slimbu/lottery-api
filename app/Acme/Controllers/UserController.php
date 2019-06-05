@@ -3,6 +3,7 @@
 namespace App\Acme\Controllers;
 
 use App\Acme\Requests\UserCreateRequest;
+use App\Acme\Requests\UserDestroyRequest;
 use App\Acme\Requests\UserGetRequest;
 use App\Acme\Requests\UserUpdateRequest;
 use App\Acme\Services\UserService;
@@ -41,15 +42,25 @@ class UserController extends ApiController
     {
         $input = $request->getInput();
         $input['user_id'] = $userId;
-        $user = auth()->user();
-        return $this->userService->updateUser($input, $user);
+        return $this->userService->updateUser($input);
+    }
+
+    public function updateMultiple(UserUpdateRequest $request)
+    {
+        $input = $request->getInput();
+        return $this->userService->updateMultipleUser($input);
     }
 
     public function destroy($userId)
     {
         $input['user_id'] = $userId;
-        $user = auth()->user();
-        return $this->userService->destroyUser($input, $user);
+        return $this->userService->destroyUser($input);
+    }
+
+    public function destroyMultiple(UserDestroyRequest $request)
+    {
+        $input = $request->getInput();
+        return $this->userService->destroyMultipleUser($input);
     }
 
     public function checkEmail(Request $request)

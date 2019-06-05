@@ -117,8 +117,43 @@ class User extends Authenticatable implements JWTSubject
             $query = $query->where('email', 'LIKE', '%' . $params['email'] . '%');
         }
 
+        if (!empty($params['is_active'])) {
+            $is_active = '';
+
+            if (strpos('active', strtolower($params['is_active'])) === 0) {
+                if (empty($is_active)) {
+                    $is_active = 1;
+                }
+            }
+
+            if (strpos('inactive', strtolower($params['is_active'])) === 0) {
+                if (empty($is_active)) {
+                    $is_active = 0;
+                }
+            }
+
+
+
+            if ($is_active === 1 || $is_active === 0) {
+                $query = $query->where('is_active', $is_active);
+            }
+        }
+
+        if (!empty($params['roles'])) {
+            $query = $query->whereHas('roles', function ($q) use ($params) {
+                 $q->where('label', 'LIKE', '%' . $params['roles'] . '%');
+            });
+        }
+
         if (!empty($params['orderBy'])) {
-            $query = $query->orderBy($params['orderBy'] === 'full_name' ? 'first_name' : $params['orderBy'], $params['ascending'] ? 'ASC' : 'DESC');
+            if ($params['orderBy'] === "roles") {
+                $query = $query->leftJoin('core_role_user', 'core_role_user.user_id', '=', 'core_users.id')
+                    ->leftJoin('core_roles', 'core_roles.id', '=', 'core_role_user.role_id')
+                    ->select('core_users.*', 'core_roles.label as user_role')
+                    ->orderBy('user_role', $params['ascending'] === 'true' ? 'ASC' : 'DESC');
+            } else {
+                $query = $query->orderBy($params['orderBy'] === 'full_name' ? 'first_name' : $params['orderBy'], $params['ascending'] === 'true' ? 'ASC' : 'DESC');
+            }
         }
 
         return $query;
