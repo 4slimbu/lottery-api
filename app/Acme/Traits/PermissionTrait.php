@@ -18,10 +18,14 @@ trait PermissionTrait
         $hasPermission = false;
         $permissions = ! is_array($permissions) ? [$permissions] : $permissions;
 
-        foreach ($permissions as $permission) {
-            if (in_array($permission, auth()->payload()->get('permissions'))) {
-                $hasPermission = true;
+        try {
+            foreach ($permissions as $permission) {
+                if (in_array($permission, auth()->payload()->get('permissions'))) {
+                    $hasPermission = true;
+                }
             }
+        } catch (\Exception $exception) {
+            // fall silently
         }
 
         return $hasPermission;
@@ -41,16 +45,19 @@ trait PermissionTrait
         $hasPermission = false;
         $permissions = ! is_array($permissions) ? [$permissions] : $permissions;
 
-        foreach ($permissions as $permission) {
-            if (! in_array($permission, auth()->payload()->get('permissions'))) {
-                $hasPermission = false;
+        try {
+            foreach ($permissions as $permission) {
+                if (!in_array($permission, auth()->payload()->get('permissions'))) {
+                    $hasPermission = false;
 
-                return $hasPermission;
+                    return $hasPermission;
+                }
+
+                $hasPermission = true;
             }
-
-            $hasPermission = true;
+        } catch (\Exception $exception) {
+            // fall silently
         }
-
 
         return $hasPermission;
     }

@@ -22,6 +22,7 @@ class UserRegistrationRequest extends ApiRequest
     public function rules()
     {
         return [
+            'username' => 'string',
             'first_name' => 'string|nullable',
             'last_name' => 'string|nullable',
             'email' => 'required|string',
@@ -30,6 +31,8 @@ class UserRegistrationRequest extends ApiRequest
             'contact_number' => 'required|string',
             'device_id' => 'string',
             'preferences' => 'array',
+            'profile_picture' => 'nullable',
+            'role' => 'numeric'
         ];
     }
 }

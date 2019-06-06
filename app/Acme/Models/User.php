@@ -7,10 +7,13 @@ use App\Acme\Resources\Core\UserResource;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Spatie\MediaLibrary\HasMedia\HasMedia;
+use Spatie\MediaLibrary\HasMedia\HasMediaTrait;
+use Spatie\MediaLibrary\Models\Media;
 use Tymon\JWTAuth\Contracts\JWTSubject;
-class User extends Authenticatable implements JWTSubject
+class User extends Authenticatable implements JWTSubject, HasMedia
 {
-    use Notifiable, SoftDeletes;
+    use Notifiable, SoftDeletes, HasMediaTrait;
 
     protected $table = 'core_users';
 
@@ -154,9 +157,17 @@ class User extends Authenticatable implements JWTSubject
             } else {
                 $query = $query->orderBy($params['orderBy'] === 'full_name' ? 'first_name' : $params['orderBy'], $params['ascending'] === 'true' ? 'ASC' : 'DESC');
             }
+        } else {
+            $query = $query->orderBy('id', 'DESC');
         }
 
         return $query;
     }
 
+    public function registerMediaConversions(Media $media = null)
+    {
+        $this->addMediaConversion('thumb')
+            ->width(100)
+            ->height(100);
+    }
 }

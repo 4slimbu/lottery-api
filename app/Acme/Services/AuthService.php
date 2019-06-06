@@ -7,16 +7,18 @@ use App\Acme\Events\Registration\UserVerifyEvent;
 use App\Acme\Models\User;
 use App\Acme\Resources\Core\UserResource;
 use App\Acme\Traits\ApiResponseTrait;
+use App\Acme\Traits\PermissionTrait;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthService extends ApiServices
 {
-    use ApiResponseTrait;
+    use ApiResponseTrait, PermissionTrait;
 
     public function register($input)
     {
-        $user = User::email($input['email'])->first();
-        if (!empty($user)) {
+        $userInDb = User::email($input['email'])->first();
+
+        if (!empty($userInDb)) {
             return $this->respondWithError('User already exists.', 'UserExistsException')->setStatusCode(400);
         }
 
@@ -29,8 +31,21 @@ class AuthService extends ApiServices
         $input['email_token'] = str_limit( md5($input['email']. str_random()), 8, '');
         $user = User::create($input);
 
+        // Add media to user
+        if (isset($input['profile_picture'])) {
+            $user->addMediaFromBase64($input['profile_picture'])
+                ->usingFileName(str_random(32) . '.png')
+                ->toMediaCollection('profile', 'profile');
+        }
+
         // Assign player role to new user user
-        $user->roles()->sync(3);
+        if ($this->currentUserCan('createRole')) {
+            if ($input['role']) {
+                $user->roles()->sync($input['role']);
+            }
+        } else {
+            $user->roles()->sync(3);
+        }
 
         event(new UserRegisteredEvent($user));
         return $this->login($loginInput);

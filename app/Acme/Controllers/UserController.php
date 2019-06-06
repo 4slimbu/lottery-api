@@ -27,8 +27,7 @@ class UserController extends ApiController
     public function create(UserCreateRequest $request)
     {
         $input = $request->getInput();
-        $user = auth()->user();
-        return $this->userService->createUser($input, $user);
+        return $this->userService->createUser($input);
     }
 
     public function show($userId)

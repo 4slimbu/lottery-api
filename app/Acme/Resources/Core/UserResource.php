@@ -14,6 +14,11 @@ class UserResource extends JsonResource
      */
     public function toArray($request)
     {
+        $profilePicture = url('/storage/placeholder/profile_picture.png');
+        if ($this->getFirstMedia('profile')) {
+            $profilePicture = $this->getFirstMedia('profile')->getFullUrl('thumb');
+        }
+
         return [
             'id' => (integer)$this->id,
             'first_name' => (string)$this->first_name,
@@ -23,7 +28,7 @@ class UserResource extends JsonResource
             'contact_number' => (string)$this->contact_number,
             'email' => (string)$this->email,
             'verified' => (bool)$this->verified,
-            'profile_pic' => (string)$this->profile_pic,
+            'profile_pic' => (string)$profilePicture,
             'is_active' => (bool)$this->is_active,
             'roles' => RoleResource::collection($this->whenLoaded('roles')),
         ];

@@ -43,11 +43,24 @@ class UserService extends ApiServices
 
         $user = new User();
         $user->fill($input);
-
-        if (!empty($input['new_password'])) {
-            $user->password = bcrypt($input['new_password']);
-        }
         $user->save();
+
+        // Add media to user
+        if (isset($input['profile_picture'])) {
+            $user->addMediaFromBase64($input['profile_picture'])
+                ->usingFileName(str_random(32) . '.png')
+                ->toMediaCollection('profile', 'profile');
+        }
+
+        // Assign player role to new user user
+        if ($this->currentUserCan('createRole')) {
+            if ($input['role']) {
+                $user->roles()->sync($input['role']);
+            }
+        } else {
+            $user->roles()->sync(3);
+        }
+
         return new UserResource($user);
     }
 
