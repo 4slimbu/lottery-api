@@ -28,6 +28,13 @@ Route::prefix('v1')->namespace('\App\Acme\Controllers')->group(function() {
     Route::put('roles/{roleId}', 'RoleController@update')->where('roleId', '[0-9]+');
     Route::delete('roles/{roleId}', 'RoleController@destroy')->where('roleId', '[0-9]+');
 
+    // Permissions
+    Route::get('permissions', 'PermissionController@index');
+    Route::post('permissions', 'PermissionController@create');
+    Route::get('permissions/{permissionId}', 'PermissionController@show')->where('permissionId', '[0-9]+');
+    Route::put('permissions/{permissionId}', 'PermissionController@update')->where('permissionId', '[0-9]+');
+    Route::delete('permissions', 'PermissionController@destroyMultiple');
+    Route::delete('permissions/{permissionId}', 'PermissionController@destroy')->where('permissionId', '[0-9]+');
 
     // Me
     Route::get('me', 'MeController@show');
