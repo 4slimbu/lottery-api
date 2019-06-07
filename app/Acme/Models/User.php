@@ -2,7 +2,6 @@
 
 namespace App\Acme\Models;
 
-use App\Acme\Models\Core\CoreProduct;
 use App\Acme\Resources\Core\UserResource;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Notifications\Notifiable;

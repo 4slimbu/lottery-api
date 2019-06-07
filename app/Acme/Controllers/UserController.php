@@ -33,8 +33,7 @@ class UserController extends ApiController
     public function show($userId)
     {
         $input['user_id'] = $userId;
-        $user = auth()->user();
-        return $this->userService->showUser($input, $user);
+        return $this->userService->showUser($input);
     }
 
     public function update(UserUpdateRequest $request, $userId)

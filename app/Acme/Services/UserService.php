@@ -9,6 +9,7 @@ use App\Acme\Models\User;
 use App\Acme\Models\UserEmailReset;
 use App\Acme\Resources\Core\UserResource;
 use App\Acme\Traits\ApiResponseTrait;
+use App\Acme\Traits\MediaUploadTrait;
 use App\Acme\Traits\PermissionTrait;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -16,7 +17,7 @@ use Illuminate\Support\Facades\Password;
 
 class UserService extends ApiServices
 {
-    use ApiResponseTrait, PermissionTrait;
+    use ApiResponseTrait, PermissionTrait, MediaUploadTrait;
 
     public function getUsers($input)
     {
@@ -47,9 +48,7 @@ class UserService extends ApiServices
 
         // Add media to user
         if (isset($input['profile_picture'])) {
-            $user->addMediaFromBase64($input['profile_picture'])
-                ->usingFileName(str_random(32) . '.png')
-                ->toMediaCollection('profile', 'profile');
+            $this->saveProfilePicture($user, $input['profile_picture']);
         }
 
         // Assign player role to new user user
@@ -64,9 +63,9 @@ class UserService extends ApiServices
         return new UserResource($user);
     }
 
-    public function showUser($input, $user)
+    public function showUser($input)
     {
-        if (!$this->currentUserCan('getUser')) {
+        if (!$this->currentUserCan('getUsers')) {
             return $this->respondWithNotAllowed();
         }
 
@@ -76,13 +75,8 @@ class UserService extends ApiServices
 
     public function updateUser($input)
     {
-        if (!$this->currentUserCan('updateUser')) {
+        if (! $this->currentUserCan('updateUser')) {
             return $this->respondWithNotAllowed();
-        }
-
-        $existingUser = User::email($input['email'])->whereNotIn('id', [$input['user_id']])->first();
-        if (!empty($existingUser)) {
-            return $this->respondWithError('User already exists.', 'UserExistsException')->setStatusCode(400);
         }
 
         $user = User::findOrFail($input['user_id']);
@@ -91,6 +85,19 @@ class UserService extends ApiServices
             $user->password = bcrypt($input['new_password']);
         }
         $user->save();
+
+        // Add media to user
+        if (isset($input['profile_picture'])) {
+            $this->saveProfilePicture($user, $input['profile_picture']);
+        }
+
+        // Assign player role to new user user
+        if ($this->currentUserCan('createRole')) {
+            if (isset($input['role'])) {
+                $user->roles()->sync($input['role']);
+            }
+        }
+
         return new UserResource($user->fresh());
     }
 
@@ -134,21 +141,6 @@ class UserService extends ApiServices
     {
         $user = User::email($input['email'])->firstOrFail();
         
-        /*
-        $re_verification = empty($user->password)?true:false;
-
-        if($input['re_verification'] == 'no') {
-            $re_verification = false;
-        }
-        
-        if($re_verification) {
-            $token = Password::getRepository()->create($user);
-            if (empty($token)) {
-                throw new ServerErrorException();
-            }
-            event(new UserReVerificationPasswordEvent($user, $token));
-        }*/
-
         return [
             'first_name' => (string)$user->first_name,
             'email' => (string)$user->email

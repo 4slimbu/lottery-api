@@ -22,12 +22,17 @@ class UserUpdateRequest extends ApiRequest
     public function rules()
     {
         return [
+            'username' => 'string',
             'first_name' => 'string',
-            'last_name' => 'string',
-            'account_id' => 'integer',
-            'new_password' => 'string|nullable',
-            'is_active' => 'integer',
-            'user_ids' => 'array'
+            'last_name' => 'string|nullable',
+            'password' => 'string|min:8|max:20',
+            'gender' => 'string',
+            'contact_number' => 'string',
+            'device_id' => 'string',
+            'preferences' => 'array',
+            'profile_picture' => 'nullable',
+            'role' => 'numeric',
+            'verified' => 'boolean'
         ];
     }
 }

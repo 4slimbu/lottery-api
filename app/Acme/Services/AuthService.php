@@ -7,12 +7,13 @@ use App\Acme\Events\Registration\UserVerifyEvent;
 use App\Acme\Models\User;
 use App\Acme\Resources\Core\UserResource;
 use App\Acme\Traits\ApiResponseTrait;
+use App\Acme\Traits\MediaUploadTrait;
 use App\Acme\Traits\PermissionTrait;
 use Tymon\JWTAuth\Facades\JWTAuth;
 
 class AuthService extends ApiServices
 {
-    use ApiResponseTrait, PermissionTrait;
+    use ApiResponseTrait, PermissionTrait, MediaUploadTrait;
 
     public function register($input)
     {
@@ -33,9 +34,7 @@ class AuthService extends ApiServices
 
         // Add media to user
         if (isset($input['profile_picture'])) {
-            $user->addMediaFromBase64($input['profile_picture'])
-                ->usingFileName(str_random(32) . '.png')
-                ->toMediaCollection('profile', 'profile');
+            $this->saveProfilePicture($user, $input['profile_picture']);
         }
 
         // Assign player role to new user user
