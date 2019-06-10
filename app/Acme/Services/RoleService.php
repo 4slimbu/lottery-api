@@ -40,7 +40,7 @@ class RoleService extends ApiServices
             return $this->respondWithNotAllowed();
         }
 
-        $existingRole = Role::find('name', $input['name'])->first();
+        $existingRole = Role::where('name', $input['name'])->first();
         if (!empty($existingRole)) {
             return $this->respondWithError('Role already exists.', 'RoleExistsException')->setStatusCode(400);
         }
@@ -49,10 +49,16 @@ class RoleService extends ApiServices
         $role->fill($input);
 
         $role->save();
+
+        if (isset($input['permission_ids'])) {
+            $role->permissions()->sync($input['permission_ids']);
+        }
+
+        $role->load('permissions');
         return new RoleResource($role);
     }
 
-    public function showRole($input, $role)
+    public function showRole($input)
     {
         if (!$this->currentUserCan('getRole')) {
             return $this->respondWithNotAllowed();
@@ -72,7 +78,14 @@ class RoleService extends ApiServices
         $role = Role::findOrFail($input['role_id']);
         $role->fill($input);
         $role->save();
-        return new RoleResource($role->fresh());
+
+        if (isset($input['permission_ids'])) {
+            $role->permissions()->sync($input['permission_ids']);
+        }
+
+        $role->fresh();
+        $role->load('permissions');
+        return new RoleResource($role);
     }
 
 
@@ -84,6 +97,15 @@ class RoleService extends ApiServices
 
         $role = Role::findOrFail($input['role_id']);
         $role->delete();
+    }
+
+    public function destroyMultipleRole($input)
+    {
+        if (!$this->currentUserCan('destroyRole')) {
+            return $this->respondWithNotAllowed();
+        }
+
+        Role::whereIn('id', $input['role_ids'])->delete();
     }
 
 }

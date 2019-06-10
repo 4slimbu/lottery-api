@@ -33,6 +33,7 @@ class RoleGetRequest extends ApiRequest
             'byColumn' => $this->get('byColumn', null),
             'orderBy' => $this->get('orderBy', null),
             'name' => $this->get('name', null),
+            'label' => $this->get('label', null),
             'with' => $this->get('with', null),
         ];
     }

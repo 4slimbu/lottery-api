@@ -26,6 +26,7 @@ Route::prefix('v1')->namespace('\App\Acme\Controllers')->group(function() {
     Route::post('roles', 'RoleController@create');
     Route::get('roles/{roleId}', 'RoleController@show')->where('roleId', '[0-9]+');
     Route::put('roles/{roleId}', 'RoleController@update')->where('roleId', '[0-9]+');
+    Route::delete('roles', 'RoleController@destroyMultiple');
     Route::delete('roles/{roleId}', 'RoleController@destroy')->where('roleId', '[0-9]+');
 
     // Permissions
