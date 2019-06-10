@@ -15,6 +15,8 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         'App\Acme\Events\Registration\UserRegisteredEvent' => [
             'App\Acme\Listeners\Registration\SendWelcomeEmailListener',
+            // Send Welcome Email
+            // Create Wallet
         ],
         'App\Acme\Events\Registration\UserForgotPasswordEvent' => [
             'App\Acme\Listeners\Registration\SendResetPasswordEmailListener',

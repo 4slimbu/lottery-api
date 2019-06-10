@@ -60,7 +60,7 @@ class UsersTableSeeder extends Seeder
         ));
 
         // Add extra random users
-        factory(User::class, 50)->create();
+        factory(User::class, 25)->create();
     }
 
 }

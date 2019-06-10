@@ -17,7 +17,8 @@ class CreateWalletTransactionsTable extends Migration {
 			$table->increments('id');
             $table->string('transaction_id')->unique();
 			$table->integer('user_id')->unsigned()->index('user_id');
-			$table->enum('type', ['top-up', 'order', 'win', 'refer', 'withdraw']);
+			$table->enum('type', ['top-up', 'order', 'win', 'refer', 'withdraw', 'refund'])->comment('top-up, order, win, refer, withdraw', 'refund');
+			$table->string('currency');
 			$table->string('amount');
 			$table->timestamps();
 		});
