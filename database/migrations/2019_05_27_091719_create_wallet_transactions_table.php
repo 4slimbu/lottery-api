@@ -15,8 +15,8 @@ class CreateWalletTransactionsTable extends Migration {
 		Schema::create('wallet_transactions', function(Blueprint $table)
 		{
 			$table->increments('id');
-            $table->string('transaction_id')->unique();
-			$table->integer('user_id')->unsigned()->index('user_id');
+            $table->string('transaction_code')->unique();
+			$table->integer('wallet_id')->unsigned()->index('wallet_id');
 			$table->enum('type', ['top-up', 'order', 'win', 'refer', 'withdraw', 'refund'])->comment('top-up, order, win, refer, withdraw', 'refund');
 			$table->string('currency');
 			$table->string('amount');

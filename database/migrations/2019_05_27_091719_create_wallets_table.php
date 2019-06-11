@@ -16,13 +16,7 @@ class CreateWalletsTable extends Migration {
 		{
             // topup amount cannot be withdrawn
             // pending withdraw amount cannot be used
-
-
-
-
-
 			$table->increments('id');
-			$table->integer('user_id')->unsigned()->index('user_id');
 			$table->string('withdrawable_amount')->comment('Can be withdrawn');
 			$table->string('pending_withdraw_amount')->comment('Amount that has been requested to withdrawn');
             $table->string('usable_amount')->comment('Usable amount: excludes withdraw pending amount');

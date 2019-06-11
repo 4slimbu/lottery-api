@@ -2,6 +2,7 @@
 
 namespace App\Acme\Resources;
 
+use App\Acme\Resources\Core\UserResource;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class LotterySlotResource extends JsonResource
@@ -14,6 +15,11 @@ class LotterySlotResource extends JsonResource
      */
     public function toArray($request)
     {
+
+        $participants = $this->whenLoaded('participants', function (){
+            return $this->participants()->select('id', 'first_name', 'last_name', 'profile_pic')->get();
+        });
+
         return [
             'id' => (integer)$this->id,
             'slot_ref' => (string)$this->slot_ref,
@@ -24,6 +30,7 @@ class LotterySlotResource extends JsonResource
             'total_amount' => (string)$this->total_amount,
             'result' => (array)$this->result,
             'status' => (string)$this->status,
+            'participants' => $participants
         ];
     }
 }

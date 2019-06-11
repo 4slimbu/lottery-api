@@ -53,6 +53,12 @@ class CorePermissionsTableSeeder extends Seeder
                 'updated_at' => date("Y-m-d H:i:s"),
             ],
             [
+                'name' => 'closeLotterySlot',
+                'label' => 'Close Lottery Slot',
+                'created_at' => date("Y-m-d H:i:s"),
+                'updated_at' => date("Y-m-d H:i:s"),
+            ],
+            [
                 'name' => 'updateLotterySlot',
                 'label' => 'Update Lottery Slot',
                 'created_at' => date("Y-m-d H:i:s"),
@@ -61,6 +67,30 @@ class CorePermissionsTableSeeder extends Seeder
             [
                 'name' => 'destroyLotterySlot',
                 'label' => 'Destroy Lottery Slot',
+                'created_at' => date("Y-m-d H:i:s"),
+                'updated_at' => date("Y-m-d H:i:s"),
+            ],
+            [
+                'name' => 'getParticipants',
+                'label' => 'Get Participants',
+                'created_at' => date("Y-m-d H:i:s"),
+                'updated_at' => date("Y-m-d H:i:s"),
+            ],
+            [
+                'name' => 'addParticipants',
+                'label' => 'Add Participants',
+                'created_at' => date("Y-m-d H:i:s"),
+                'updated_at' => date("Y-m-d H:i:s"),
+            ],
+            [
+                'name' => 'generateResult',
+                'label' => 'Generate Result',
+                'created_at' => date("Y-m-d H:i:s"),
+                'updated_at' => date("Y-m-d H:i:s"),
+            ],
+            [
+                'name' => 'getWinners',
+                'label' => 'Get Winners',
                 'created_at' => date("Y-m-d H:i:s"),
                 'updated_at' => date("Y-m-d H:i:s"),
             ],
@@ -135,7 +165,7 @@ class CorePermissionsTableSeeder extends Seeder
                 'label' => 'Destroy Permission',
                 'created_at' => date("Y-m-d H:i:s"),
                 'updated_at' => date("Y-m-d H:i:s"),
-            ]
+            ],
         ]);
     }
 }

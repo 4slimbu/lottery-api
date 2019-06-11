@@ -56,7 +56,8 @@ trait ApiResponseTrait
     }
 
     /**
-     * @param array $message
+     * @param string $message
+     * @param string $apiErrorCode
      * @return \Illuminate\Http\JsonResponse
      */
     protected function respondWithNotAllowed($message = 'Not allowed.', $apiErrorCode = 'NotAllowedException')
@@ -66,12 +67,28 @@ trait ApiResponseTrait
 
     /**
      * @param string $message
+     * @param string $apiErrorCode
+     * @param array $headers
      * @return \Illuminate\Http\JsonResponse
      */
     protected function respondWithError($message = 'Oops! Something went wrong.', $apiErrorCode = 'unknownError', $headers = [])
     {
         return response()->json([
             'error' => $apiErrorCode,
+            'message' => $message
+        ], $this->getStatusCode(), $headers);
+    }
+
+    /**
+     * @param string $message
+     * @param string $apiSuccessCode
+     * @param array $headers
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function respondWithSuccess($message = 'Success!', $apiSuccessCode = 'success', $headers = [])
+    {
+        return response()->json([
+            'success' => $apiSuccessCode,
             'message' => $message
         ], $this->getStatusCode(), $headers);
     }

@@ -1,6 +1,8 @@
 <?php
 
 use App\Acme\Models\LotterySlot;
+use App\Acme\Models\LotterySlotUser;
+use App\Acme\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -16,55 +18,60 @@ class LotterySlotsTableSeeder extends Seeder
     {
         DB::table('lottery_slots')->truncate();
 
-        LotterySlot::insert([
-            [
+        $limit = 25;
+        $faker = Faker\Factory::create();
+        for ($i = 0; $i < $limit; $i++) {
+            $result = [
+                $faker->numberBetween(1, 100),
+                $faker->numberBetween(1, 100),
+                $faker->numberBetween(1, 100),
+                $faker->numberBetween(1, 100),
+                $faker->numberBetween(1, 100),
+                $faker->numberBetween(1, 100),
+            ];
+
+            $totalParticipants = $faker->numberBetween(0, 10);
+            $hasWinner = $totalParticipants > 0 ? $faker->boolean(25) : 0;
+            $totalAmount = $totalParticipants * 10;
+
+            $lotterySlot = LotterySlot::create([
                 'slot_ref' => str_random(18),
-                'start_time' => date("Y-m-d H:i:s", time() - 15 * 60),
-                'end_time' => date("Y-m-d H:i:s", time() - 10 * 60),
-                'has_winner' => 1,
-                'total_participants' => 23,
+                'start_time' => date("Y-m-d H:i:s", time() - ($limit - $i) * 5 * 60),
+                'end_time' => date("Y-m-d H:i:s", time() - ($limit - $i) * 10 * 60),
+                'has_winner' => $hasWinner,
+                'total_participants' => $totalParticipants,
                 'currency' => 'USD',
-                'entry_fee' => '1',
-                'total_amount' => 1000,
-                'result' => '[62, 84, 83, 12, 38, 81]',
-                'status' => 0,
-            ],
-            [
-                'slot_ref' => str_random(18),
-                'start_time' => date("Y-m-d H:i:s", time() - 10 * 60),
-                'end_time' => date("Y-m-d H:i:s", time() - 5 * 60),
-                'has_winner' => 1,
-                'total_participants' => 46,
-                'currency' => 'USD',
-                'entry_fee' => '1',
-                'total_amount' => 1000,
-                'result' => '[23, 16, 83, 74, 82, 19]',
-                'status' => 0,
-            ],
-            [
-                'slot_ref' => str_random(18),
-                'start_time' => date("Y-m-d H:i:s", time() - 5 * 60),
-                'end_time' => date("Y-m-d H:i:s", time()),
-                'has_winner' => 0,
-                'total_participants' => 75,
-                'currency' => 'USD',
-                'entry_fee' => '1',
-                'total_amount' => 1000,
-                'result' => '[12, 23, 56, 13, 27, 18]',
-                'status' => 0,
-            ],
-            [
-                'slot_ref' => str_random(18),
-                'start_time' => date("Y-m-d H:i:s", time()),
-                'end_time' => date("Y-m-d H:i:s", time() + 5 * 60),
-                'has_winner' => 1,
-                'total_participants' => 50,
-                'currency' => 'USD',
-                'entry_fee' => '1',
-                'total_amount' => 2000,
-                'result' => '[2, 25, 17, 10, 59, 78]',
-                'status' => 1,
-            ],
-        ]);
+                'entry_fee' => 10,
+                'total_amount' => $totalAmount,
+                'result' => $result,
+                'status' => $i === ($limit - 1) ? 1 : 0,
+            ]);
+
+            $notInArray = [1, 2, 3];
+            for ($j = 0; $j < $totalParticipants; $j++) {
+                $lotteryNumber = [
+                    $faker->numberBetween(1, 100),
+                    $faker->numberBetween(1, 100),
+                    $faker->numberBetween(1, 100),
+                    $faker->numberBetween(1, 100),
+                    $faker->numberBetween(1, 100),
+                    $faker->numberBetween(1, 100),
+                ];
+                $lotteryWinnerTypeId = $hasWinner && $j === 0 ? 1 : null;
+                $userId = User::inRandomOrder()->whereNotIn('id', $notInArray)->first()->id;
+                $notInArray[] = $userId;
+
+                $lott = LotterySlotUser::create([
+                    'lottery_slot_id' => $lotterySlot->id,
+                    'user_id' => $userId,
+                    'lottery_number' => $lotteryWinnerTypeId ? $result : $lotteryNumber,
+                    'lottery_winner_type_id' => $lotteryWinnerTypeId,
+                    'currency' => $lotteryWinnerTypeId ? 'USD' : null,
+                    'won_amount' => $lotteryWinnerTypeId ? $totalAmount * 0.9 : null,
+                    'service_charge' => $lotteryWinnerTypeId ? $totalAmount * 0.1 : null
+                ]);
+
+            }
+        }
     }
 }

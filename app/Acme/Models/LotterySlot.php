@@ -9,13 +9,18 @@ class LotterySlot extends Model
     protected $table = 'lottery_slots';
 
     protected $fillable = [
-        'slot_ref', 'start_time', 'end_time', 'has_winner', 'total_participants',
+        'slot_ref', 'start_time', 'end_time', 'has_winner', 'total_participants', 'currency', 'entry_fee',
         'total_amount', 'result', 'status'
         ];
 
     protected $casts = [
         'result' => 'array'
     ];
+
+    public function participants()
+    {
+        return $this->belongsToMany(User::class)->withPivot('lottery_number', 'lottery_winner_type_id', 'currency', 'won_amount', 'service_charge');
+    }
 
     public function scopeFilter($query, $params)
     {

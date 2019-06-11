@@ -64,10 +64,19 @@ class User extends Authenticatable implements JWTSubject, HasMedia
         return $this->hasOne(UserEmailReset::class);
     }
 
-
     public function roles()
     {
         return $this->belongsToMany(Role::class, 'core_role_user');
+    }
+
+    public function wallet()
+    {
+        return $this->hasOne(Wallet::class);
+    }
+
+    public function withdrawGateway()
+    {
+        return $this->hasOne(WithdrawGateway::class);
     }
 
     public function hasRole($role)
@@ -86,7 +95,6 @@ class User extends Authenticatable implements JWTSubject, HasMedia
         );
     }
 
-    
     public function getFullNameAttribute()
     {
         $output = '';

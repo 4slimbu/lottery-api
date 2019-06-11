@@ -37,10 +37,10 @@ Route::prefix('v1')->namespace('\App\Acme\Controllers')->group(function() {
     Route::delete('permissions', 'PermissionController@destroyMultiple');
     Route::delete('permissions/{permissionId}', 'PermissionController@destroy')->where('permissionId', '[0-9]+');
 
-    // Permissions
+    // Lottery
     Route::get('lottery/slots', 'LotteryController@index');
     Route::post('lottery/slots', 'LotteryController@create');
-    Route::get('lottery/slots/{lotterySlotId}', 'LotteryController@show')->where('lotterySlotId', '[0-9]+');
+    Route::get('lottery/slots/{lotterySlotId}', 'LotteryController@showLotterySlot')->where('lotterySlotId', '[0-9]+');
     Route::put('lottery/slots/{lotterySlotId}', 'LotteryController@update')->where('lotterySlotId', '[0-9]+');
     Route::delete('lottery/slots', 'LotteryController@destroyMultiple');
     Route::delete('lottery/slots/{lotterySlotId}', 'LotteryController@destroy')->where('lotterySlotId', '[0-9]+');

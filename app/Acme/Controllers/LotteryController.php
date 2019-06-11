@@ -26,16 +26,20 @@ class LotteryController extends ApiController
         return $this->lotteryService->getLotterySlots($input);
     }
 
-    public function create(RoleCreateRequest $request)
+    public function create()
     {
-        $input = $request->getInput();
-        return $this->lotteryService->createRole($input);
+        return $this->lotteryService->closeLotterySlot();
     }
 
-    public function show($roleId)
+    public function showLotterySlot(Request $request, $lotterySlotId)
     {
-        $input['role_id'] = $roleId;
-        return $this->lotteryService->showRole($input);
+        $input['lottery_slot_id'] = $lotterySlotId;
+
+        if ($request->get('with')) {
+            $input['with'] = $request->get('with');
+        }
+
+        return $this->lotteryService->showLotterySlot($input);
     }
 
     public function update(RoleUpdateRequest $request, $roleId)
