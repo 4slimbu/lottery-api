@@ -15,7 +15,8 @@ class CreateWithdrawGatewayTable extends Migration {
 		Schema::create('withdraw_gateway', function(Blueprint $table)
 		{
 			$table->increments('id');
-			$table->string('gateway')->default('bitcoin')->comment('e.g: bitcoin');
+            $table->integer('user_id')->unsigned();
+            $table->string('gateway')->default('bitcoin')->comment('e.g: bitcoin');
 			$table->string('gateway_username')->nullable()->comment('e.g: user@bitcoin.com');
 			$table->timestamps();
 		});

@@ -12,9 +12,9 @@ class Wallet extends Model
         'user_id', 'withdrawable_amount', 'pending_withdraw_amount', 'usable_amount', 'total_amount'
     ];
 
-    public function user()
+    public function transactions()
     {
-        return $this->belongsTo(User::class);
+        return $this->hasMany(WalletTransaction::class);
     }
 
     public function scopeFilter($query, $params)

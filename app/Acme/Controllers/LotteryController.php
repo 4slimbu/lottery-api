@@ -4,6 +4,7 @@ namespace App\Acme\Controllers;
 
 use App\Acme\Models\LotterySlot;
 use App\Acme\Requests\LotterySlotGetRequest;
+use App\Acme\Requests\LotteryWinnerGetRequest;
 use App\Acme\Requests\RoleCreateRequest;
 use App\Acme\Requests\RoleDestroyMultipleRequest;
 use App\Acme\Requests\RoleGetRequest;
@@ -28,7 +29,25 @@ class LotteryController extends ApiController
 
     public function create()
     {
+        return $this->lotteryService->createLotterySlot();
+    }
+
+    public function close()
+    {
         return $this->lotteryService->closeLotterySlot();
+    }
+
+    public function addParticipant(Request $request)
+    {
+        $userId = $request->get('user_id');
+
+        return $this->lotteryService->addParticipantToActiveLotterySlot($userId);
+    }
+
+    public function getWinners(LotteryWinnerGetRequest $request)
+    {
+        $input = $request->getFilter();
+        return $this->lotteryService->getWinners($input);
     }
 
     public function showLotterySlot(Request $request, $lotterySlotId)

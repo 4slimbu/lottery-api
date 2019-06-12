@@ -9,7 +9,7 @@ class WithdrawGateway extends Model
     protected $table = 'withdraw_gateway';
 
     protected $fillable = [
-        'gateway', 'gateway_username'
+        'user_id', 'gateway', 'gateway_username'
     ];
 
     public function user()

@@ -39,10 +39,10 @@ class DatabaseSeeder extends Seeder
         $this->call(LotteryWinnerTypesTableSeeder::class);
 
         //===============Wallet====================
+        $this->call(WalletTableSeeder::class);
 
-        // User registers
-        // Top up wallet
-        // Play lottery
-        //
+        //===============Withdraw Gateway====================
+        $this->call(WithdrawGatewayTableSeeder::class);
+
     }
 }

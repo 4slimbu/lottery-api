@@ -2,21 +2,16 @@
 
 namespace App\Acme\Services;
 
-use App\Acme\Events\Registration\RoleForgotPasswordEvent;
-use App\Acme\Exceptions\ServerErrorException;
+use App\Acme\Events\Registration\LotteryClosedEvent;
 use App\Acme\Models\LotterySlot;
 use App\Acme\Models\LotterySlotUser;
-use App\Acme\Models\PasswordReset;
-use App\Acme\Models\Role;
-use App\Acme\Models\RoleEmailReset;
 use App\Acme\Models\Setting;
+use App\Acme\Models\User;
+use App\Acme\Models\WalletTransaction;
 use App\Acme\Resources\LotterySlotResource;
-use App\Acme\Resources\Core\RoleResource;
+use App\Acme\Resources\LotterySlotUserResource;
 use App\Acme\Traits\ApiResponseTrait;
 use App\Acme\Traits\PermissionTrait;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Password;
 
 class LotteryService extends ApiServices
 {
@@ -120,7 +115,7 @@ class LotteryService extends ApiServices
         // Run only if no active lottery is present
         $activeLotterySlot = LotterySlot::where('status', 1)->count();
         if ($activeLotterySlot > 0) {
-            return $this->respondWithNotAllowed();
+            return $this->setStatusCode(400)->respondWithError('Only one slot can be active', 'activeSlotPresent');
         }
 
         // Check if previous lottery slot has winner
@@ -195,29 +190,107 @@ class LotteryService extends ApiServices
             'has_winner' => $winnersCount > 0 ? 1 : 0
         ]);
 
-        // if result match any of the participant lottery_number, declare winner
-        // if auto generate lottery slot is true then
-        // generate another lottery slot with initial amount added from closed lottery slot
-        // send email to admin, winners
+        // Fire lottery closed event
+        event(new LotteryClosedEvent($activeLotterySlot));
+
+        // Return closed lottery slot
+        return $this->setStatusCode(200)->respondWithSuccess();
     }
 
-    public function addParticipantToActiveLotterySlot()
+    public function addParticipantToActiveLotterySlot($userId)
     {
         if (!$this->currentUserCan('addParticipants')) {
             return $this->respondWithNotAllowed();
         }
+
+        // Check if user already is in the lottery slot
+        $user = User::where('id', $userId)->first();
+
+        // Check is user has role: player
+        if (! $user->hasRole('player')) {
+            return $this->setStatusCode(400)->respondWithError('User is not a player', 'userNotPlayer');
+        }
+
         // Check if user have the entry fee amount in their wallet
-        // If yes, add user as participant to lottery and generate/pick lottery_number
-        // Send Participant added event
-        // Send email to admin, user
+        $activeLotterySlot = LotterySlot::where('status', 1)->orderBy('id', 'DESC')->first();
+        $currentUserAsParticipant = LotterySlotUser::where('lottery_slot_id', $activeLotterySlot->id)->where('user_id', $user->id)->count();
+
+        if ($currentUserAsParticipant > 0) {
+            return $this->setStatusCode(400)->respondWithError('Duplicate Entry not allowed', 'duplicateEntry');
+        }
+
+        // Check user wallet and see if it meets the entry value
+        // Get config
+        $currency = Setting::where('key', 'app_currency')->first();
+        $entryFee = Setting::where('key', 'lottery_slot_entry_fee')->first();
+        $wallet = $user->wallet;
+
+        if (! $wallet->usable_amount > $entryFee->value) {
+            return $this->setStatusCode(400)->respondWithError('Insufficient Fund', 'insufficientFund');
+        }
+
+        // Do transaction
+        $transaction = WalletTransaction::create([
+            'transaction_code' => str_random(18),
+            'wallet_id' => $wallet->id,
+            'type' => 'order',
+            'currency' => $currency->value,
+            'amount' => $entryFee->value
+        ]);
+
+        if (! $transaction) {
+            return $this->setStatusCode(400)->respondWithError('Transaction Failed', 'transactionFailed');
+        }
+
+        // Sync Wallet
+        // Entry fee should be deducted from usable amount
+        $usable_amount = $wallet->usable_amount - $entryFee->value;
+        // If usable amount drops below withdrawable amount, it should be synced
+        $withdrawable_amount = $wallet->usable_amount >= $wallet->withdrawable_amount ? $wallet->withdrawable_amount : $wallet->usable_amount;
+        $pending_withdraw_amount = $wallet->pending_withdraw_amount;
+        $total_amount = $pending_withdraw_amount + $usable_amount;
+
+        $wallet->update([
+            'withdrawable_amount' => $withdrawable_amount,
+            'pending_withdraw_amount' => $pending_withdraw_amount,
+            'usable_amount' => $usable_amount,
+            'total_amount' => $total_amount,
+            'updated_at' => date("Y-m-d H:i:s")
+        ]);
+
+        // Add participant
+        LotterySlotUser::create([
+            'lottery_slot_id' => $activeLotterySlot->id,
+            'user_id' => $user->id,
+            'lottery_number' => $this->generateRandomLotteryNumber(),
+        ]);
+
+        // Update Lottery Slot participants count and total amount
+        $participantsCount = $activeLotterySlot->participants()->count();
+        $totalAmount = $activeLotterySlot->total_amount + $entryFee->value;
+
+        $activeLotterySlot->update([
+            'total_participants' => $participantsCount,
+            'total_amount' => $totalAmount
+        ]);
+
+        // trigger participant added event
+        // event(new participantAddedEvent)
+
+        return new LotterySlotResource($activeLotterySlot);
     }
 
-    public function getWinners()
+    public function getWinners($input)
     {
         if (!$this->currentUserCan('getWinners')) {
             return $this->respondWithNotAllowed();
         }
+
         // Get all winners list
+        $query = LotterySlotUser::where('lottery_winner_type_id', '!=', null);
+
+        $winners = $query->paginate($input['limit'] ?? 15);
+        return LotterySlotUserResource::collection($winners);
     }
 
     public function generateResult()

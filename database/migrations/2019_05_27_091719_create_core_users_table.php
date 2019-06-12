@@ -28,8 +28,6 @@ class CreateCoreUsersTable extends Migration {
             $table->string('profile_pic')->nullable();
             $table->bigInteger('fb_id')->nullable();
             $table->string('device_id')->nullable();
-            $table->integer('withdraw_gateway_id')->unsigned()->nullable();
-            $table->integer('wallet_id')->unsigned()->nullable();
             $table->integer('referral_id')->unsigned()->nullable();
             $table->integer('referred_by_id')->unsigned()->nullable();
             $table->dateTime('last_login_date')->nullable();

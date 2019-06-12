@@ -40,6 +40,9 @@ Route::prefix('v1')->namespace('\App\Acme\Controllers')->group(function() {
     // Lottery
     Route::get('lottery/slots', 'LotteryController@index');
     Route::post('lottery/slots', 'LotteryController@create');
+    Route::post('lottery/slots/close', 'LotteryController@close');
+    Route::post('lottery/slots/add-participant', 'LotteryController@addParticipant');
+    Route::get('lottery/slots/winners', 'LotteryController@getWinners');
     Route::get('lottery/slots/{lotterySlotId}', 'LotteryController@showLotterySlot')->where('lotterySlotId', '[0-9]+');
     Route::put('lottery/slots/{lotterySlotId}', 'LotteryController@update')->where('lotterySlotId', '[0-9]+');
     Route::delete('lottery/slots', 'LotteryController@destroyMultiple');
