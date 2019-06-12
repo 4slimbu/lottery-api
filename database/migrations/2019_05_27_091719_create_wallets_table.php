@@ -18,10 +18,10 @@ class CreateWalletsTable extends Migration {
             // pending withdraw amount cannot be used
 			$table->increments('id');
             $table->integer('user_id')->unsigned();
-            $table->string('withdrawable_amount')->comment('Can be withdrawn');
-			$table->string('pending_withdraw_amount')->comment('Amount that has been requested to withdrawn');
-            $table->string('usable_amount')->comment('Usable amount: excludes withdraw pending amount');
-            $table->string('total_amount')->comment('Usable + Pending Withdraw');
+            $table->decimal('withdrawable_amount', 13, 2)->comment('Can be withdrawn');
+			$table->decimal('pending_withdraw_amount', 13, 2)->comment('Amount that has been requested to withdrawn');
+            $table->decimal('usable_amount', 13, 2)->comment('Usable amount: excludes withdraw pending amount');
+            $table->decimal('total_amount', 13, 2)->comment('Usable + Pending Withdraw');
 			$table->timestamps();
 		});
 	}

@@ -12,6 +12,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
+        //===============Settings==================
+        // Seed Settings
+        $this->call(SettingsTableSeeder::class);
+
+        //===============Currency==================
+        $this->call(CurrencyTableSeeder::class);
+
         //==========Roles and Permissions==========
         // Seed Permissions
         $this->call([CorePermissionsTableSeeder::class]);
@@ -28,10 +35,6 @@ class DatabaseSeeder extends Seeder
 
         // Seed User Roles
         $this->call([CoreRoleUserTableSeeder::class]);
-
-        //===============Settings==================
-        // Seed Settings
-        $this->call(SettingsTableSeeder::class);
 
         //===============Lottery===================
         // Seed Lottery Winner Types

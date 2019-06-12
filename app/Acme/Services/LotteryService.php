@@ -127,7 +127,6 @@ class LotteryService extends ApiServices
         }
 
         // Get config
-        $currency = Setting::where('key', 'app_currency')->first();
         $entryFee = Setting::where('key', 'lottery_slot_entry_fee')->first();
 
         // Create new lottery slot
@@ -135,7 +134,6 @@ class LotteryService extends ApiServices
             'slot_ref' => str_random(18),
             'start_time' => date("Y-m-d H:i:s", time()),
             'end_time' => date("Y-m-d H:i:s", time() + 5 * 60),
-            'currency' => $currency->value,
             'entry_fee' => $entryFee->value,
             'total_amount' => $previousBalance,
             'status' => 1,
@@ -166,7 +164,6 @@ class LotteryService extends ApiServices
 
         if ($winnersCount > 0) {
             // Get config
-            $currency = Setting::where('key', 'app_currency')->first();
             $serviceChargePercent = Setting::where('key', 'lottery_slot_service_charge')->first();
             $lotteryAmount = $activeLotterySlot->total_amount;
             $wonAmount = ($lotteryAmount / $winnersCount) * ((100 - $serviceChargePercent->value) / 100);
@@ -175,7 +172,6 @@ class LotteryService extends ApiServices
             foreach ($winners as $winner) {
                 $winner->fill([
                     'lottery_winner_type_id' => 1,
-                    'currency' => $currency->value,
                     'won_amount' => $wonAmount,
                     'service_charge' => $serviceCharge
                 ])->save();
@@ -221,7 +217,6 @@ class LotteryService extends ApiServices
 
         // Check user wallet and see if it meets the entry value
         // Get config
-        $currency = Setting::where('key', 'app_currency')->first();
         $entryFee = Setting::where('key', 'lottery_slot_entry_fee')->first();
         $wallet = $user->wallet;
 
@@ -234,7 +229,6 @@ class LotteryService extends ApiServices
             'transaction_code' => str_random(18),
             'wallet_id' => $wallet->id,
             'type' => 'order',
-            'currency' => $currency->value,
             'amount' => $entryFee->value
         ]);
 

@@ -14,7 +14,7 @@ class LotterySlotUser extends Model
     public $incrementing = false;
 
     protected $fillable = [
-        'lottery_slot_id', 'user_id', 'lottery_number', 'lottery_winner_type_id', 'currency', 'won_amount', 'service_charge'
+        'lottery_slot_id', 'user_id', 'lottery_number', 'lottery_winner_type_id', 'won_amount', 'service_charge'
     ];
 
     protected $casts = [

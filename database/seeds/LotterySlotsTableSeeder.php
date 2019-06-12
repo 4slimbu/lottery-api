@@ -40,7 +40,6 @@ class LotterySlotsTableSeeder extends Seeder
                 'end_time' => date("Y-m-d H:i:s", time() - ($limit - $i) * 10 * 60),
                 'has_winner' => $hasWinner,
                 'total_participants' => $totalParticipants,
-                'currency' => 'USD',
                 'entry_fee' => 10,
                 'total_amount' => $totalAmount,
                 'result' => $result,
@@ -66,7 +65,6 @@ class LotterySlotsTableSeeder extends Seeder
                     'user_id' => $userId,
                     'lottery_number' => $lotteryWinnerTypeId ? $result : $lotteryNumber,
                     'lottery_winner_type_id' => $lotteryWinnerTypeId,
-                    'currency' => $lotteryWinnerTypeId ? 'USD' : null,
                     'won_amount' => $lotteryWinnerTypeId ? $totalAmount * 0.9 : null,
                     'service_charge' => $lotteryWinnerTypeId ? $totalAmount * 0.1 : null
                 ]);

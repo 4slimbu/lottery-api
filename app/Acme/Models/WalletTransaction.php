@@ -9,7 +9,7 @@ class WalletTransaction extends Model
     protected $table = 'wallet_transactions';
 
     protected $fillable = [
-        'transaction_code', 'wallet_id', 'type', 'currency', 'amount'
+        'transaction_code', 'wallet_id', 'type', 'amount'
     ];
 
     public function scopeFilter($query, $params)

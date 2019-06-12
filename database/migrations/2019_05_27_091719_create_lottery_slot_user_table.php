@@ -18,9 +18,8 @@ class CreateLotterySlotUserTable extends Migration {
             $table->integer('user_id')->unsigned();
             $table->string('lottery_number');
             $table->integer('lottery_winner_type_id')->unsigned()->nullable();
-            $table->string('currency')->nullable();
-            $table->string('won_amount')->nullable();
-            $table->string('service_charge')->nullable();
+            $table->decimal('won_amount', 13, 2)->nullable();
+            $table->decimal('service_charge', 13, 2)->nullable();
             $table->primary(['lottery_slot_id','user_id']);
 		});
 	}

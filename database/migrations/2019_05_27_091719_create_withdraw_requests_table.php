@@ -16,7 +16,7 @@ class CreateWithdrawRequestsTable extends Migration {
 		{
 			$table->increments('id');
 			$table->integer('user_id')->unsigned()->index('user_id');
-			$table->string('amount');
+			$table->decimal('amount', 13, 2);
 			$table->enum('status', ['pending', 'processing', 'completed', 'failed', 'cancelled'])->default('pending');
 			$table->timestamps();
 		});
