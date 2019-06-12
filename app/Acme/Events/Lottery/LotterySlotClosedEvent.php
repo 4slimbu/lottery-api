@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Acme\Events\Registration;
+namespace App\Acme\Events\Lottery;
 
 use App\Acme\Models\LotterySlot;
 use App\Acme\Models\User;
@@ -13,7 +13,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class LotteryClosedEvent
+class LotterySlotClosedEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -21,12 +21,9 @@ class LotteryClosedEvent
 
     /**
      * Create a new event instance.
-     *
-     * @param LotterySlot $lotterySlot
      */
-    public function __construct(LotterySlot $lotterySlot)
+    public function __construct()
     {
-        $this->lotterySlot = $lotterySlot;
     }
 
     /**
@@ -41,9 +38,7 @@ class LotteryClosedEvent
 
     public function broadcastWith()
     {
-        // return lottery slot info
         return [
-            'data' => new LotterySlotResource($this->lotterySlot)
         ];
     }
 }

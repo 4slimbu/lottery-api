@@ -2,7 +2,11 @@
 
 namespace App\Acme\Services;
 
-use App\Acme\Events\Registration\LotteryClosedEvent;
+use App\Acme\Events\Lottery\ParticipantAddedEvent;
+use App\Acme\Events\Lottery\LotterySlotClosedEvent;
+use App\Acme\Events\Lottery\LotterySlotCreatedEvent;
+use App\Acme\Events\Lottery\LotterySlotResultGeneratedEvent;
+use App\Acme\Events\Wallet\WalletTransactionEvent;
 use App\Acme\Models\LotterySlot;
 use App\Acme\Models\LotterySlotUser;
 use App\Acme\Models\Setting;
@@ -139,9 +143,11 @@ class LotteryService extends ApiServices
             'status' => 1,
         ]);
 
-        // Send lottery Slot create event
+        // Fire lottery slot created event
+        event(new LotterySlotCreatedEvent());
+
+        // Return response;
         return $this->respondWithSuccess();
-//        event(new LotterySlotCreated);
     }
 
     public function closeLotterySlot()
@@ -151,8 +157,7 @@ class LotteryService extends ApiServices
         }
 
         // Return if no open lottery slot is present
-//        $activeLotterySlot = LotterySlot::where('status', 1)->orderBy('id', 'DESC')->first();
-        $activeLotterySlot = LotterySlot::where('id', 20)->orderBy('id', 'DESC')->first();
+        $activeLotterySlot = LotterySlot::where('status', 1)->orderBy('id', 'DESC')->first();
         if (! $activeLotterySlot) {
             return $this->setStatusCode(400)->respondWithError('No open lottery slot', 'noOpenLotterySlot');
         }
@@ -185,9 +190,11 @@ class LotteryService extends ApiServices
             'status' => 0,
             'has_winner' => $winnersCount > 0 ? 1 : 0
         ]);
+        // Fire lottery slot result generated event
+        event(new LotterySlotResultGeneratedEvent());
 
         // Fire lottery closed event
-        event(new LotteryClosedEvent($activeLotterySlot));
+        event(new LotterySlotClosedEvent());
 
         // Return closed lottery slot
         return $this->setStatusCode(200)->respondWithSuccess();
@@ -252,6 +259,9 @@ class LotteryService extends ApiServices
             'updated_at' => date("Y-m-d H:i:s")
         ]);
 
+        // Fire wallet transaction event
+        event(new WalletTransactionEvent());
+
         // Add participant
         LotterySlotUser::create([
             'lottery_slot_id' => $activeLotterySlot->id,
@@ -269,7 +279,7 @@ class LotteryService extends ApiServices
         ]);
 
         // trigger participant added event
-        // event(new participantAddedEvent)
+        event(new ParticipantAddedEvent());
 
         return new LotterySlotResource($activeLotterySlot);
     }
