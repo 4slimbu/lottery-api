@@ -11,6 +11,7 @@ use App\Acme\Models\LotterySlot;
 use App\Acme\Models\LotterySlotUser;
 use App\Acme\Models\Setting;
 use App\Acme\Models\User;
+use App\Acme\Models\Wallet;
 use App\Acme\Models\WalletTransaction;
 use App\Acme\Resources\LotterySlotResource;
 use App\Acme\Resources\LotterySlotUserResource;
@@ -20,6 +21,8 @@ use App\Acme\Traits\PermissionTrait;
 class LotteryService extends ApiServices
 {
     use ApiResponseTrait, PermissionTrait;
+
+    protected $walletService;
 
     /**
      * Get lottery slots along with participants if with field is provided
@@ -180,6 +183,9 @@ class LotteryService extends ApiServices
                     'won_amount' => $wonAmount,
                     'service_charge' => $serviceCharge
                 ])->save();
+
+                $wallet = Wallet::where('user_id', $winner->id)->findOrFail();
+                (new WalletService)->handleTransaction($wallet, 'win', $wonAmount);
             }
         }
 
@@ -214,7 +220,7 @@ class LotteryService extends ApiServices
             return $this->setStatusCode(400)->respondWithError('User is not a player', 'userNotPlayer');
         }
 
-        // Check if user have the entry fee amount in their wallet
+        // Check if user already exist in the slot
         $activeLotterySlot = LotterySlot::where('status', 1)->orderBy('id', 'DESC')->first();
         $currentUserAsParticipant = LotterySlotUser::where('lottery_slot_id', $activeLotterySlot->id)->where('user_id', $user->id)->count();
 
@@ -222,45 +228,9 @@ class LotteryService extends ApiServices
             return $this->setStatusCode(400)->respondWithError('Duplicate Entry not allowed', 'duplicateEntry');
         }
 
-        // Check user wallet and see if it meets the entry value
-        // Get config
+        // Handle Wallet Transaction
         $entryFee = Setting::where('key', 'lottery_slot_entry_fee')->first();
-        $wallet = $user->wallet;
-
-        if (! $wallet->usable_amount > $entryFee->value) {
-            return $this->setStatusCode(400)->respondWithError('Insufficient Fund', 'insufficientFund');
-        }
-
-        // Do transaction
-        $transaction = WalletTransaction::create([
-            'transaction_code' => str_random(18),
-            'wallet_id' => $wallet->id,
-            'type' => 'order',
-            'amount' => $entryFee->value
-        ]);
-
-        if (! $transaction) {
-            return $this->setStatusCode(400)->respondWithError('Transaction Failed', 'transactionFailed');
-        }
-
-        // Sync Wallet
-        // Entry fee should be deducted from usable amount
-        $usable_amount = $wallet->usable_amount - $entryFee->value;
-        // If usable amount drops below withdrawable amount, it should be synced
-        $withdrawable_amount = $wallet->usable_amount >= $wallet->withdrawable_amount ? $wallet->withdrawable_amount : $wallet->usable_amount;
-        $pending_withdraw_amount = $wallet->pending_withdraw_amount;
-        $total_amount = $pending_withdraw_amount + $usable_amount;
-
-        $wallet->update([
-            'withdrawable_amount' => $withdrawable_amount,
-            'pending_withdraw_amount' => $pending_withdraw_amount,
-            'usable_amount' => $usable_amount,
-            'total_amount' => $total_amount,
-            'updated_at' => date("Y-m-d H:i:s")
-        ]);
-
-        // Fire wallet transaction event
-        event(new WalletTransactionEvent());
+        (new WalletService)->handleTransaction($user->wallet, 'order', $entryFee->value);
 
         // Add participant
         LotterySlotUser::create([

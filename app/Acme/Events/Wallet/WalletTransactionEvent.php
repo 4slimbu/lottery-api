@@ -4,6 +4,7 @@ namespace App\Acme\Events\Wallet;
 
 use App\Acme\Models\LotterySlot;
 use App\Acme\Models\User;
+use App\Acme\Models\WalletTransaction;
 use App\Acme\Resources\LotterySlotResource;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
@@ -17,13 +18,15 @@ class WalletTransactionEvent
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $lotterySlot;
+    public $walletTransaction;
 
     /**
      * Create a new event instance.
+     * @param WalletTransaction $walletTransaction
      */
-    public function __construct()
+    public function __construct(WalletTransaction $walletTransaction)
     {
+        $this->walletTransaction = $walletTransaction;
     }
 
     /**
