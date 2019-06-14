@@ -3,7 +3,7 @@
 namespace App\Acme\Services;
 
 use App\Acme\Events\Registration\RoleForgotPasswordEvent;
-use App\Acme\Events\Wallet\WalletTransactionEvent;
+use App\Events\WalletTransactionEvent;
 use App\Acme\Exceptions\ServerErrorException;
 use App\Acme\Models\LotterySlot;
 use App\Acme\Models\PasswordReset;

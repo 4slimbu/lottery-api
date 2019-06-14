@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Acme\Events\Wallet;
+namespace App\Events;
 
 use App\Acme\Models\LotterySlot;
 use App\Acme\Models\User;
@@ -14,7 +14,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class WalletTransactionEvent
+class WalletTransactionEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -42,6 +42,7 @@ class WalletTransactionEvent
     public function broadcastWith()
     {
         return [
+            'data' => 'Wallet Transaction Event'
         ];
     }
 }

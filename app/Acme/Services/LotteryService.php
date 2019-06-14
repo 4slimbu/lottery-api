@@ -2,11 +2,11 @@
 
 namespace App\Acme\Services;
 
-use App\Acme\Events\Lottery\ParticipantAddedEvent;
-use App\Acme\Events\Lottery\LotterySlotClosedEvent;
-use App\Acme\Events\Lottery\LotterySlotCreatedEvent;
-use App\Acme\Events\Lottery\LotterySlotResultGeneratedEvent;
-use App\Acme\Events\Wallet\WalletTransactionEvent;
+use App\Events\ParticipantAddedEvent;
+use App\Events\LotterySlotClosedEvent;
+use App\Events\LotterySlotCreatedEvent;
+use App\Events\LotterySlotResultGeneratedEvent;
+use App\Events\WalletTransactionEvent;
 use App\Acme\Models\LotterySlot;
 use App\Acme\Models\LotterySlotUser;
 use App\Acme\Models\Setting;

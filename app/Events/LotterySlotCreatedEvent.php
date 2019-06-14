@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Acme\Events\Lottery;
+namespace App\Events;
 
 use App\Acme\Models\LotterySlot;
 use App\Acme\Models\User;
@@ -13,7 +13,7 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class LotterySlotClosedEvent
+class LotterySlotCreatedEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -39,6 +39,7 @@ class LotterySlotClosedEvent
     public function broadcastWith()
     {
         return [
+            'data' => 'Lottery Slot Created Event'
         ];
     }
 }

@@ -14,5 +14,5 @@
 //Route::view('/{path?}', 'app');
 
 Route::get('test-broadcast', function(){
-    broadcast(new \App\Events\ExampleEvent);
+    broadcast(new \App\Events\ParticipantAddedEvent);
 });
