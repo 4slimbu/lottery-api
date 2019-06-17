@@ -300,4 +300,81 @@ class LotteryService extends ApiServices
         return $lotteryNumber;
     }
 
+    /**
+     * Check if active lottery slot is present
+     * @return bool
+     */
+    public function isLotterySlotActive()
+    {
+        // Check if lottery slot is active
+        $activeLotterySlot = LotterySlot::where('status', 1)->orderBy('id', 'DESC')->first();
+
+        return !! $activeLotterySlot;
+    }
+
+    public function isActiveLotterySlotExpired()
+    {
+        // Check if lottery slot is active and expired
+        $expiredActiveLotterySlot = LotterySlot::where('status', 1)->where('end_time', '<', date(now()) )->orderBy('id', 'DESC')->first();
+
+        return !! $expiredActiveLotterySlot;
+    }
+
+    public function runLottery()
+    {
+        // Check if lottery slot is already active
+        if ($this->isLotterySlotActive()) {
+            // If end_date is expired, close the lottery slot
+            if ($this->isActiveLotterySlotExpired()) {
+                $this->closeLotterySlot();
+            }
+            // Else, If auto generate is on,
+        } else {
+            $isAutoGenerateLotterySlot = Setting::where('key', 'lottery_slot_auto_generate')->first();
+
+            if ($isAutoGenerateLotterySlot) {
+                $this->createLotterySlot();
+            }
+        }
+    }
+
+    public function addFakeParticipants()
+    {
+        // Check if user already exist in the slot
+        $activeLotterySlot = LotterySlot::where('status', 1)->where('end_time', '>', date(now()))->orderBy('id', 'DESC')->first();
+
+        // If no active lottery slot then return
+        if (!$activeLotterySlot) {
+            return;
+        }
+
+        // Get active lottery slot participants count
+        $maxFakeUsers = Setting::where('key', 'lottery_slot_max_fake_users')->first();
+        $countOfUsersToCreate = mt_rand(1, 5);
+
+        $fakeParticipantsCount = LotterySlotUser::leftJoin('core_users', 'core_users.id', '=', 'lottery_slot_user.user_id')
+            ->where('core_users.is_bot', 1)
+            ->where('lottery_slot_user.lottery_slot_id', $activeLotterySlot->id)->count();
+
+        $totalFakeUsers = User::where('is_bot', 1)->count();
+
+        // If total fake users is already used, return
+        if ($totalFakeUsers <= $fakeParticipantsCount) {
+            return;
+        }
+
+        // If max fake users exceed then return
+        if ($fakeParticipantsCount + $countOfUsersToCreate >= $maxFakeUsers->value) {
+            return;
+        }
+
+        // Generate fake users equal to $countOfUsersToCreate
+        $newFakeUsers = User::where('is_bot', 1)->select('id')->limit($countOfUsersToCreate)->inRandomOrder()->get();
+
+        foreach ($newFakeUsers as $newFakeUser) {
+            $this->addParticipantToActiveLotterySlot($newFakeUser->id);
+        }
+
+    }
+
 }

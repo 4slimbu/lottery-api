@@ -29,7 +29,7 @@ class LotteryController extends ApiController
 
     public function create()
     {
-        return $this->lotteryService->createLotterySlot();
+        return $this->lotteryService->runLottery();
     }
 
     public function close()
@@ -41,7 +41,8 @@ class LotteryController extends ApiController
     {
         $userId = $request->get('user_id');
 
-        return $this->lotteryService->addParticipantToActiveLotterySlot($userId);
+        return $this->lotteryService->addFakeParticipants();
+//        return $this->lotteryService->addParticipantToActiveLotterySlot($userId);
     }
 
     public function getWinners(LotteryWinnerGetRequest $request)

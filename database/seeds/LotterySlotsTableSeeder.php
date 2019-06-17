@@ -31,7 +31,8 @@ class LotterySlotsTableSeeder extends Seeder
             ];
 
             $totalParticipants = $faker->numberBetween(0, 10);
-            $hasWinner = $totalParticipants > 0 ? $faker->boolean(25) : 0;
+            $isActive = $i === ($limit - 1) ? 1 : 0;
+            $hasWinner = !$isActive && $totalParticipants > 0 ? $faker->boolean(25) : 0;
             $totalAmount = $totalParticipants * 10;
 
             $lotterySlot = LotterySlot::create([
@@ -42,8 +43,8 @@ class LotterySlotsTableSeeder extends Seeder
                 'total_participants' => $totalParticipants,
                 'entry_fee' => 10,
                 'total_amount' => $totalAmount,
-                'result' => $result,
-                'status' => $i === ($limit - 1) ? 1 : 0,
+                'result' => ! $isActive ? $result : null,
+                'status' => $isActive,
             ]);
 
             $notInArray = [1, 2, 3];

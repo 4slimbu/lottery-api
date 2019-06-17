@@ -2,6 +2,8 @@
 
 namespace App\Jobs;
 
+use App\Acme\Models\User;
+use App\Acme\Services\LotteryService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -12,14 +14,18 @@ class AddParticipant implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    protected $lotteryService;
+    protected $user;
+
     /**
      * Create a new job instance.
-     *
-     * @return void
+     * @param LotteryService $lotteryService
+     * @param User $user
      */
-    public function __construct()
+    public function __construct(LotteryService $lotteryService, User $user)
     {
-        //
+        $this->lotteryService = $lotteryService;
+        $this->user = $user;
     }
 
     /**
@@ -29,6 +35,6 @@ class AddParticipant implements ShouldQueue
      */
     public function handle()
     {
-        //
+        $this->lotteryService->addParticipantToActiveLotterySlot($this->user->id);
     }
 }

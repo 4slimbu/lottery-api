@@ -32,6 +32,7 @@ class CreateCoreUsersTable extends Migration {
             $table->integer('referred_by_id')->unsigned()->nullable();
             $table->dateTime('last_login_date')->nullable();
             $table->boolean('is_active')->default(1);
+            $table->boolean('is_bot')->default(0);
             $table->softDeletes();
             $table->timestamps();
 		});

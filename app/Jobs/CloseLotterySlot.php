@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Acme\Services\LotteryService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
@@ -12,14 +13,15 @@ class CloseLotterySlot implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
+    protected $lotteryService;
+
     /**
      * Create a new job instance.
-     *
-     * @return void
+     * @param LotteryService $lotteryService
      */
-    public function __construct()
+    public function __construct(LotteryService $lotteryService)
     {
-        //
+        $this->lotteryService = $lotteryService;
     }
 
     /**
@@ -29,6 +31,6 @@ class CloseLotterySlot implements ShouldQueue
      */
     public function handle()
     {
-        //
+        $this->lotteryService->closeLotterySlot();
     }
 }

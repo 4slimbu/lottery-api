@@ -2,6 +2,8 @@
 
 namespace App\Console;
 
+use App\Acme\Services\LotteryService;
+use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -24,8 +26,26 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        $seconds = 5;
+
+        $schedule->call(function () use ($seconds) {
+
+            $dt = Carbon::now();
+
+            $x=60/$seconds;
+
+            do{
+
+                // do your function here that takes between 3 and 4 seconds
+                $lotteryService = new LotteryService();
+                $lotteryService->runLottery();
+                $lotteryService->addFakeParticipants();
+
+                time_sleep_until($dt->addSeconds($seconds)->timestamp);
+
+            } while($x-- > 0);
+
+        })->everyMinute();
     }
 
     /**
