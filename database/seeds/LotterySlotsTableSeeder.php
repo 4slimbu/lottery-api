@@ -37,8 +37,8 @@ class LotterySlotsTableSeeder extends Seeder
 
             $lotterySlot = LotterySlot::create([
                 'slot_ref' => str_random(18),
-                'start_time' => date("Y-m-d H:i:s", time() - ($limit - $i) * 5 * 60),
-                'end_time' => date("Y-m-d H:i:s", time() - ($limit - $i) * 10 * 60),
+                'start_time' => date("Y-m-d H:i:s", time() - ($limit - ($i + 1)) * 5 * 60),
+                'end_time' => date("Y-m-d H:i:s", time() - ($limit - ($i + 1)) * 5 * 60 + 5 * 60 ),
                 'has_winner' => $hasWinner,
                 'total_participants' => $totalParticipants,
                 'entry_fee' => 10,

@@ -17,6 +17,8 @@ use App\Acme\Resources\LotterySlotResource;
 use App\Acme\Resources\LotterySlotUserResource;
 use App\Acme\Traits\ApiResponseTrait;
 use App\Acme\Traits\PermissionTrait;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class LotteryService extends ApiServices
 {
@@ -111,14 +113,14 @@ class LotteryService extends ApiServices
      * Transfer amount from previous lottery if no winner was selected
      * Fire Lottery Slot Created Event
      *
+     * @param bool $isSystem
      * @return \Illuminate\Http\JsonResponse
      */
-    public function createLotterySlot()
+    public function createLotterySlot($isSystem = false)
     {
-        if (!$this->currentUserCan('createLotterySlot')) {
+        if (!$isSystem && !$this->currentUserCan('createLotterySlot')) {
             return $this->respondWithNotAllowed();
         }
-
         // Run only if no active lottery is present
         $activeLotterySlot = LotterySlot::where('status', 1)->count();
         if ($activeLotterySlot > 0) {
@@ -153,11 +155,13 @@ class LotteryService extends ApiServices
         return $this->respondWithSuccess();
     }
 
-    public function closeLotterySlot()
+    public function closeLotterySlot($isSystem = false)
     {
-        if (!$this->currentUserCan('closeLotterySlot')) {
+
+        if (!$isSystem && !$this->currentUserCan('closeLotterySlot')) {
             return $this->respondWithNotAllowed();
         }
+
 
         // Return if no open lottery slot is present
         $activeLotterySlot = LotterySlot::where('status', 1)->orderBy('id', 'DESC')->first();
@@ -165,9 +169,13 @@ class LotteryService extends ApiServices
             return $this->setStatusCode(400)->respondWithError('No open lottery slot', 'noOpenLotterySlot');
         }
 
+        // generate result
+        $result = $this->generateResult($isSystem);
+
+
         // check if winners exist
         // We are only checking for whole match
-        $winners = LotterySlotUser::where('lottery_slot_id', $activeLotterySlot->id)->where('lottery_number', json_encode($activeLotterySlot->result))->get();
+        $winners = LotterySlotUser::where('lottery_slot_id', $activeLotterySlot->id)->where('lottery_number', json_encode($result))->get();
         $winnersCount = count($winners);
 
         if ($winnersCount > 0) {
@@ -184,18 +192,18 @@ class LotteryService extends ApiServices
                     'service_charge' => $serviceCharge
                 ])->save();
 
-                $wallet = Wallet::where('user_id', $winner->id)->findOrFail();
+                $wallet = Wallet::where('user_id', $winner->user_id)->first();
                 (new WalletService)->handleTransaction($wallet, 'win', $wonAmount);
             }
         }
 
-        // generate result
-        $result = $this->generateResult();
+        // Update Lottery slot with new info
         $activeLotterySlot->update([
             'result' => $result,
             'status' => 0,
             'has_winner' => $winnersCount > 0 ? 1 : 0
         ]);
+
         // Fire lottery slot result generated event
         event(new LotterySlotResultGeneratedEvent());
 
@@ -206,12 +214,15 @@ class LotteryService extends ApiServices
         return $this->setStatusCode(200)->respondWithSuccess();
     }
 
-    public function addParticipantToActiveLotterySlot($userId)
+    public function addParticipantToActiveLotterySlot($userId, $isSystem)
     {
-        if (!$this->currentUserCan('addParticipants')) {
+        if (! $userId) {
             return $this->respondWithNotAllowed();
         }
 
+        if (!$isSystem && !$this->currentUserCan('addParticipants')) {
+            return $this->respondWithNotAllowed();
+        }
         // Check if user already is in the lottery slot
         $user = User::where('id', $userId)->first();
 
@@ -220,8 +231,13 @@ class LotteryService extends ApiServices
             return $this->setStatusCode(400)->respondWithError('User is not a player', 'userNotPlayer');
         }
 
-        // Check if user already exist in the slot
-        $activeLotterySlot = LotterySlot::where('status', 1)->orderBy('id', 'DESC')->first();
+        // Check if user already exist in the slot and the slot is active/not-expired
+        $activeLotterySlot = LotterySlot::where('status', 1)->where('end_time', '>', date(now()))->orderBy('id', 'DESC')->first();
+
+        if (! $activeLotterySlot) {
+            return $this->respondWithNotAllowed();
+        }
+
         $currentUserAsParticipant = LotterySlotUser::where('lottery_slot_id', $activeLotterySlot->id)->where('user_id', $user->id)->count();
 
         if ($currentUserAsParticipant > 0) {
@@ -267,11 +283,12 @@ class LotteryService extends ApiServices
         return LotterySlotUserResource::collection($winners);
     }
 
-    public function generateResult()
+    public function generateResult($isSystem = false)
     {
-        if (!$this->currentUserCan('generateResult')) {
+        if (!$isSystem && !$this->currentUserCan('generateResult')) {
             return $this->respondWithNotAllowed();
         }
+
         return $this->generateRandomLotteryNumber();
     }
 
@@ -320,25 +337,25 @@ class LotteryService extends ApiServices
         return !! $expiredActiveLotterySlot;
     }
 
-    public function runLottery()
+    public function runLottery($isSystem = false)
     {
         // Check if lottery slot is already active
         if ($this->isLotterySlotActive()) {
             // If end_date is expired, close the lottery slot
             if ($this->isActiveLotterySlotExpired()) {
-                $this->closeLotterySlot();
+                $this->closeLotterySlot($isSystem);
             }
             // Else, If auto generate is on,
         } else {
             $isAutoGenerateLotterySlot = Setting::where('key', 'lottery_slot_auto_generate')->first();
 
             if ($isAutoGenerateLotterySlot) {
-                $this->createLotterySlot();
+                $this->createLotterySlot($isSystem);
             }
         }
     }
 
-    public function addFakeParticipants()
+    public function addFakeParticipants($isSystem = false)
     {
         // Check if user already exist in the slot
         $activeLotterySlot = LotterySlot::where('status', 1)->where('end_time', '>', date(now()))->orderBy('id', 'DESC')->first();
@@ -372,7 +389,7 @@ class LotteryService extends ApiServices
         $newFakeUsers = User::where('is_bot', 1)->select('id')->limit($countOfUsersToCreate)->inRandomOrder()->get();
 
         foreach ($newFakeUsers as $newFakeUser) {
-            $this->addParticipantToActiveLotterySlot($newFakeUser->id);
+            $this->addParticipantToActiveLotterySlot($newFakeUser->id, $isSystem);
         }
 
     }

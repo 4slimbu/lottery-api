@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Acme\Models\Setting;
 use App\Acme\Services\LotteryService;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class RunLottery extends Command
 {

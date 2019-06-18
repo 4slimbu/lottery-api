@@ -100,7 +100,7 @@ class SettingsTableSeeder extends Seeder
             [
                 'key' => 'lottery_slot_max_fake_users',
                 'label' => 'Max Fake Users Per Lottery Slot',
-                'value' => '20',
+                'value' => '250',
                 'field' => 'radio',
                 'field_value' => '0,1',
                 'created_at' => date("Y-m-d H:i:s"),

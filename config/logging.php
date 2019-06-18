@@ -36,7 +36,7 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['single','audit_log'],
+            'channels' => ['single'],
         ],
 
         'single' => [
@@ -78,10 +78,6 @@ return [
             'level' => 'debug',
         ],
 
-        'audit_log' => [
-            'driver'    => 'monolog',
-            'handler'   => AuditLogHandler::class
-        ],
     ],
 
 ];

@@ -6,6 +6,7 @@ use App\Acme\Services\LotteryService;
 use Carbon\Carbon;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use Illuminate\Support\Facades\Log;
 
 class Kernel extends ConsoleKernel
 {
@@ -28,18 +29,16 @@ class Kernel extends ConsoleKernel
     {
         $seconds = 5;
 
-        $schedule->call(function () use ($seconds) {
+        $schedule->call(function () use ($schedule, $seconds) {
 
             $dt = Carbon::now();
 
             $x=60/$seconds;
 
             do{
-
                 // do your function here that takes between 3 and 4 seconds
-                $lotteryService = new LotteryService();
-                $lotteryService->runLottery();
-                $lotteryService->addFakeParticipants();
+                (new LotteryService)->runLottery($isSystem = true);
+                (new LotteryService)->addFakeParticipants($isSystem = true);
 
                 time_sleep_until($dt->addSeconds($seconds)->timestamp);
 
@@ -59,4 +58,5 @@ class Kernel extends ConsoleKernel
 
         require base_path('routes/console.php');
     }
+
 }
