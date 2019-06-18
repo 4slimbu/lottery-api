@@ -164,7 +164,8 @@ class LotteryService extends ApiServices
 
 
         // Return if no open lottery slot is present
-        $activeLotterySlot = LotterySlot::where('status', 1)->orderBy('id', 'DESC')->first();
+        $activeLotterySlot = LotterySlot::where('id', 46)->orderBy('id', 'DESC')->first();
+//        $activeLotterySlot = LotterySlot::where('status', 1)->orderBy('id', 'DESC')->first();
         if (! $activeLotterySlot) {
             return $this->setStatusCode(400)->respondWithError('No open lottery slot', 'noOpenLotterySlot');
         }
@@ -204,8 +205,10 @@ class LotteryService extends ApiServices
             'has_winner' => $winnersCount > 0 ? 1 : 0
         ]);
 
+        var_dump($activeLotterySlot->winners()->get());
+
         // Fire lottery slot result generated event
-        event(new LotterySlotResultGeneratedEvent());
+        event(new LotterySlotResultGeneratedEvent($activeLotterySlot));
 
         // Fire lottery closed event
         event(new LotterySlotClosedEvent());
@@ -265,7 +268,7 @@ class LotteryService extends ApiServices
         ]);
 
         // trigger participant added event
-        event(new ParticipantAddedEvent());
+        event(new ParticipantAddedEvent($activeLotterySlot));
 
         return new LotterySlotResource($activeLotterySlot);
     }
@@ -289,7 +292,8 @@ class LotteryService extends ApiServices
             return $this->respondWithNotAllowed();
         }
 
-        return $this->generateRandomLotteryNumber();
+        return [77,94,57,87,67,76];
+//        return $this->generateRandomLotteryNumber();
     }
 
     /**

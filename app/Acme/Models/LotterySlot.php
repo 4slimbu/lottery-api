@@ -22,6 +22,11 @@ class LotterySlot extends Model
         return $this->belongsToMany(User::class)->withPivot('lottery_number', 'lottery_winner_type_id', 'won_amount', 'service_charge');
     }
 
+    public function winners()
+    {
+        return $this->belongsToMany(User::class)->withPivot('lottery_number', 'lottery_winner_type_id', 'won_amount', 'service_charge')->where('lottery_winner_type_id', '!=', null);
+    }
+
     public function scopeFilter($query, $params)
     {
         if (!empty($params['orderBy'])) {

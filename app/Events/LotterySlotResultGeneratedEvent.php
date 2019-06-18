@@ -21,9 +21,11 @@ class LotterySlotResultGeneratedEvent implements ShouldBroadcast
 
     /**
      * Create a new event instance.
+     * @param LotterySlot $lotterySlot
      */
-    public function __construct()
+    public function __construct(LotterySlot $lotterySlot)
     {
+        $this->lotterySlot = $lotterySlot;
     }
 
     /**
@@ -38,8 +40,24 @@ class LotterySlotResultGeneratedEvent implements ShouldBroadcast
 
     public function broadcastWith()
     {
+        $winners = $this->whenLoaded('winners', function (){
+            return $this->winners()->select('id', 'first_name', 'last_name', 'profile_pic')->get();
+        });
+
+        $data =  [
+            'id' => (integer)$this->id,
+            'slot_ref' => (string)$this->slot_ref,
+            'start_time' => (string)$this->start_time,
+            'end_time' => (string)$this->end_time,
+            'has_winner' => (string)$this->has_winner,
+            'total_participants' => (string)$this->total_participants,
+            'total_amount' => (string)$this->total_amount,
+            'result' => (array)$this->result,
+            'status' => (string)$this->status,
+        ];
+
         return [
-            'data' => 'Lottery Slot Result Generated Event'
+            'data' => $data
         ];
     }
 }

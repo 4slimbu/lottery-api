@@ -5,6 +5,7 @@ namespace App\Events;
 use App\Acme\Models\LotterySlot;
 use App\Acme\Models\User;
 use App\Acme\Resources\LotterySlotResource;
+use App\Acme\Resources\LotterySlotUserResource;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -21,9 +22,11 @@ class ParticipantAddedEvent implements ShouldBroadcast
 
     /**
      * Create a new event instance.
+     * @param LotterySlot $lotterySlot
      */
-    public function __construct()
+    public function __construct(LotterySlot $lotterySlot)
     {
+        $this->lotterySlot = $lotterySlot;
     }
 
     /**
@@ -39,7 +42,17 @@ class ParticipantAddedEvent implements ShouldBroadcast
     public function broadcastWith()
     {
         return [
-            'data' => 'Participant Added Event'
+            "data" => [
+                'id' => (integer)$this->lotterySlot->id,
+                'slot_ref' => (string)$this->lotterySlot->slot_ref,
+                'start_time' => (string)$this->lotterySlot->start_time,
+                'end_time' => (string)$this->lotterySlot->end_time,
+                'has_winner' => (string)$this->lotterySlot->has_winner,
+                'total_participants' => (string)$this->lotterySlot->total_participants,
+                'total_amount' => (string)$this->lotterySlot->total_amount,
+                'result' => (array)$this->lotterySlot->result,
+                'status' => (string)$this->lotterySlot->status,
+            ]
         ];
     }
 }
