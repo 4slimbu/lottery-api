@@ -32,8 +32,12 @@ class LotterySlotGetRequest extends ApiRequest
             'page' => $this->get('page', null),
             'byColumn' => $this->get('byColumn', null),
             'orderBy' => $this->get('orderBy', null),
-            'name' => $this->get('name', null),
-            'label' => $this->get('label', null),
+            'slot_ref' => $this->get('slot_ref', null),
+            'has_winner' => $this->get('has_winner', null),
+            'total_participants' => $this->get('total_participants', null),
+            'total_amount' => $this->get('total_amount', null),
+            'result' => $this->get('result', null),
+            'status' => $this->get('status', null),
             'with' => $this->get('with', null),
         ];
     }

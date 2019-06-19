@@ -292,8 +292,8 @@ class LotteryService extends ApiServices
             return $this->respondWithNotAllowed();
         }
 
-        return [77,94,57,87,67,76];
-//        return $this->generateRandomLotteryNumber();
+//        return [77,94,57,87,67,76];
+        return $this->generateRandomLotteryNumber();
     }
 
     /**

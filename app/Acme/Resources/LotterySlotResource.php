@@ -16,8 +16,9 @@ class LotterySlotResource extends JsonResource
     public function toArray($request)
     {
 
-        $participants = $this->whenLoaded('participants', function (){
-            return $this->participants()->select('id', 'first_name', 'last_name', 'profile_pic')->get();
+        $inputs = $request->all();
+        $participants = $this->whenLoaded('participants', function () use ($inputs) {
+            return $this->participants()->paginate($inputs['limit'] ?? 15);
         });
 
         return [
