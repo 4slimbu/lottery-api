@@ -60,7 +60,7 @@ class RoleService extends ApiServices
 
     public function showRole($input)
     {
-        if (!$this->currentUserCan('getRole')) {
+        if (!$this->currentUserCan('getRoles')) {
             return $this->respondWithNotAllowed();
         }
 
