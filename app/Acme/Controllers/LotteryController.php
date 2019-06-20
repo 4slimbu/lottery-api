@@ -17,7 +17,7 @@ class LotteryController extends ApiController
     private $lotteryService;
     public function __construct(LotteryService $lotteryService)
     {
-        $this->middleware('auth:api');
+        $this->middleware('auth:api')->except('getWinners');
         $this->lotteryService = $lotteryService;
     }
 
@@ -47,7 +47,7 @@ class LotteryController extends ApiController
     public function getWinners(LotteryWinnerGetRequest $request)
     {
         $input = $request->getFilter();
-        return $this->lotteryService->getWinners($input);
+        return $this->lotteryService->getWinners($input, $isSystem=true);
     }
 
     public function showLotterySlot(Request $request, $lotterySlotId)

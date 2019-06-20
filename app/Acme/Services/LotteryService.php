@@ -273,9 +273,9 @@ class LotteryService extends ApiServices
         return new LotterySlotResource($activeLotterySlot);
     }
 
-    public function getWinners($input)
+    public function getWinners($input, $isSystem = false)
     {
-        if (!$this->currentUserCan('getWinners')) {
+        if (!$isSystem && !$this->currentUserCan('getWinners')) {
             return $this->respondWithNotAllowed();
         }
 
