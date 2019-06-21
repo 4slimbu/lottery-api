@@ -86,17 +86,17 @@ class WalletService extends ApiServices
             case 'top-up':
                 // top-up
                 // When user top up, amount is added to usable_amount and total_amount is calculated with pending amount
-                $this->handleTopUpTransaction($wallet, $amount);
+                return $this->handleTopUpTransaction($wallet, $amount);
                 break;
             case 'order':
                 // order
                 // When user buys lottery ticket, amount is deducted from usable_amount and total is recalculated
-                $this->handleOrderTransaction($wallet, $amount);
+                return $this->handleOrderTransaction($wallet, $amount);
                 break;
             case 'win':
                 // win/refer
                 // When user wins lottery, amount is added to withdrawable as well as usable and total is calculated
-                $this->handleWinTransaction($wallet, $amount);
+                return $this->handleWinTransaction($wallet, $amount);
 
                 break;
             case 'withdraw':
@@ -197,7 +197,8 @@ class WalletService extends ApiServices
         ]);
 
         if (! $transaction) {
-            return $this->setStatusCode(400)->respondWithError('Transaction Failed', 'transactionFailed');
+            return false;
+//            return $this->setStatusCode(400)->respondWithError('Transaction Failed', 'transactionFailed');
         }
 
         // Sync Wallet
@@ -218,6 +219,7 @@ class WalletService extends ApiServices
 
         // Fire wallet transaction event
         event(new WalletTransactionEvent($transaction));
+        return true;
     }
 
     public function handleReferTransaction()

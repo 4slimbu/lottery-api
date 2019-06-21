@@ -54,10 +54,11 @@ class LotterySlotResultGeneratedEvent implements ShouldBroadcast
             'total_amount' => (string)$this->total_amount,
             'result' => (array)$this->result,
             'status' => (string)$this->status,
+            'winners' => $winners
         ];
 
         return [
-            'data' => $data
+            'result' => $data
         ];
     }
 }

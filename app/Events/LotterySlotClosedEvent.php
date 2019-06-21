@@ -17,13 +17,15 @@ class LotterySlotClosedEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $lotterySlot;
+    public $data;
 
     /**
      * Create a new event instance.
+     * @param $data
      */
-    public function __construct()
+    public function __construct( $data)
     {
+        $this->data = $data;
     }
 
     /**
@@ -38,8 +40,6 @@ class LotterySlotClosedEvent implements ShouldBroadcast
 
     public function broadcastWith()
     {
-        return [
-            'data' => 'Lottery Slot Closed Event'
-        ];
+        return $this->data;
     }
 }

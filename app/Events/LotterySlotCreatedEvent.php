@@ -21,9 +21,11 @@ class LotterySlotCreatedEvent implements ShouldBroadcast
 
     /**
      * Create a new event instance.
+     * @param LotterySlot $lotterySlot
      */
-    public function __construct()
+    public function __construct(LotterySlot $lotterySlot)
     {
+        $this->lotterySlot = $lotterySlot;
     }
 
     /**
@@ -39,7 +41,8 @@ class LotterySlotCreatedEvent implements ShouldBroadcast
     public function broadcastWith()
     {
         return [
-            'data' => 'Lottery Slot Created Event'
+            'event' => 'LotterySlotCreatedEvent',
+            'slot' => $this->lotterySlot->toArray(),
         ];
     }
 }

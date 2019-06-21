@@ -19,14 +19,16 @@ class ParticipantAddedEvent implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $lotterySlot;
+    public $participant;
 
     /**
      * Create a new event instance.
      * @param LotterySlot $lotterySlot
      */
-    public function __construct(LotterySlot $lotterySlot)
+    public function __construct(LotterySlot $lotterySlot, $participant)
     {
         $this->lotterySlot = $lotterySlot;
+        $this->participant = $participant;
     }
 
     /**
@@ -52,7 +54,8 @@ class ParticipantAddedEvent implements ShouldBroadcast
                 'total_amount' => (string)$this->lotterySlot->total_amount,
                 'result' => (array)$this->lotterySlot->result,
                 'status' => (string)$this->lotterySlot->status,
-            ]
+            ],
+            "participant" => $this->participant
         ];
     }
 }

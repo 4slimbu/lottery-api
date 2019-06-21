@@ -55,16 +55,20 @@ class LotteryService extends ApiServices
      * Can get participants related to lottery slot if with field is present
      *
      * @param $input
+     * @param bool $isSystem
      * @return LotterySlotResource|\Illuminate\Http\JsonResponse
      */
-    public function showLotterySlot($input)
+    public function showLotterySlot($input, $isSystem = false)
     {
-        if (!$this->currentUserCan('getLotterySlots')) {
+        if (!$isSystem && !$this->currentUserCan('getLotterySlots')) {
             return $this->respondWithNotAllowed();
         }
 
+        if (! isset($input['lottery_slot_id'])) {
+            return $this->respondNotFound();
+        }
         // If user can get Participants
-        if ($this->currentUserCan('getParticipants')) {
+        if ($isSystem || $this->currentUserCan('getParticipants')) {
             // If with=participants is present in request then load participants
             if (isset($input['with']) && $input['with'] === 'participants') {
                 $lotterySlot = LotterySlot::with('participants')->findOrFail($input['lottery_slot_id']);
@@ -137,35 +141,34 @@ class LotteryService extends ApiServices
 
         // Get config
         $entryFee = Setting::where('key', 'lottery_slot_entry_fee')->first();
+        $runDuration = Setting::where('key', 'lottery_slot_run_duration')->first();
 
         // Create new lottery slot
-        LotterySlot::create([
+        $lotterySlot = LotterySlot::create([
             'slot_ref' => str_random(18),
             'start_time' => date("Y-m-d H:i:s", time()),
-            'end_time' => date("Y-m-d H:i:s", time() + 5 * 60),
+            'end_time' => date("Y-m-d H:i:s", time() + $runDuration->value * 60),
             'entry_fee' => $entryFee->value,
             'total_amount' => $previousBalance,
             'status' => 1,
         ]);
 
         // Fire lottery slot created event
-        event(new LotterySlotCreatedEvent());
+        event(new LotterySlotCreatedEvent($lotterySlot));
 
         // Return response;
         return $this->respondWithSuccess();
     }
 
-    public function closeLotterySlot($isSystem = false)
+    public function closeLotterySlot($isSystem = true)
     {
-
         if (!$isSystem && !$this->currentUserCan('closeLotterySlot')) {
             return $this->respondWithNotAllowed();
         }
 
-
         // Return if no open lottery slot is present
-        $activeLotterySlot = LotterySlot::where('id', 46)->orderBy('id', 'DESC')->first();
-//        $activeLotterySlot = LotterySlot::where('status', 1)->orderBy('id', 'DESC')->first();
+//        $activeLotterySlot = LotterySlot::where('id', 46)->orderBy('id', 'DESC')->first();
+        $activeLotterySlot = LotterySlot::where('status', 1)->orderBy('id', 'DESC')->first();
         if (! $activeLotterySlot) {
             return $this->setStatusCode(400)->respondWithError('No open lottery slot', 'noOpenLotterySlot');
         }
@@ -205,19 +208,30 @@ class LotteryService extends ApiServices
             'has_winner' => $winnersCount > 0 ? 1 : 0
         ]);
 
-        var_dump($activeLotterySlot->winners()->get());
-
         // Fire lottery slot result generated event
-        event(new LotterySlotResultGeneratedEvent($activeLotterySlot));
+//        event(new LotterySlotResultGeneratedEvent($activeLotterySlot));
+
+        $data = [
+            'result' => $activeLotterySlot->result,
+            'has_winner' => $activeLotterySlot->has_winner
+            ];
+
+        if ($winnersCount > 0) {
+            $data['last_winners'] = $activeLotterySlot->winners->toArray();
+            // Get all winners list
+            $winners = LotterySlotUser::where('lottery_winner_type_id', '!=', null)
+                ->orderBy('lottery_slot_id', 'DESC')->paginate(15);
+            $data['winners'] = LotterySlotUserResource::collection($winners);
+        }
 
         // Fire lottery closed event
-        event(new LotterySlotClosedEvent());
+        event(new LotterySlotClosedEvent($data));
 
         // Return closed lottery slot
         return $this->setStatusCode(200)->respondWithSuccess();
     }
 
-    public function addParticipantToActiveLotterySlot($userId, $isSystem)
+    public function addParticipantToActiveLotterySlot($userId, $isSystem = false)
     {
         if (! $userId) {
             return $this->respondWithNotAllowed();
@@ -249,10 +263,14 @@ class LotteryService extends ApiServices
 
         // Handle Wallet Transaction
         $entryFee = Setting::where('key', 'lottery_slot_entry_fee')->first();
-        (new WalletService)->handleTransaction($user->wallet, 'order', $entryFee->value);
+        $transaction = (new WalletService)->handleTransaction($user->wallet, 'order', $entryFee->value);
+
+        if (! $transaction) {
+            return $this->setStatusCode(400)->respondWithError('Transaction Failed', 'transactionFailed');
+        }
 
         // Add participant
-        LotterySlotUser::create([
+        $lotterySlotUser = LotterySlotUser::create([
             'lottery_slot_id' => $activeLotterySlot->id,
             'user_id' => $user->id,
             'lottery_number' => $this->generateRandomLotteryNumber(),
@@ -267,8 +285,13 @@ class LotteryService extends ApiServices
             'total_amount' => $totalAmount
         ]);
 
+        $participant = [
+            'id' => $lotterySlotUser->id,
+            'full_name' => $lotterySlotUser->user->full_name
+        ];
+
         // trigger participant added event
-        event(new ParticipantAddedEvent($activeLotterySlot));
+        event(new ParticipantAddedEvent($activeLotterySlot, $participant));
 
         return new LotterySlotResource($activeLotterySlot);
     }
@@ -280,11 +303,25 @@ class LotteryService extends ApiServices
         }
 
         // Get all winners list
-        $query = LotterySlotUser::where('lottery_winner_type_id', '!=', null);
+        $query = LotterySlotUser::where('lottery_winner_type_id', '!=', null)->orderBy('lottery_slot_id', 'DESC');
 
         $winners = $query->paginate($input['limit'] ?? 15);
         return LotterySlotUserResource::collection($winners);
     }
+
+    public function getActiveSlot($input, $isSystem = false)
+    {
+        if (!$isSystem && !$this->currentUserCan('getActiveSlot')) {
+            return $this->respondWithNotAllowed();
+        }
+
+        // Get all winners list
+        $query = LotterySlot::where('status', 1)->first();
+
+        $winners = $query->paginate($input['limit'] ?? 15);
+        return LotterySlotUserResource::collection($winners);
+    }
+
 
     public function generateResult($isSystem = false)
     {
@@ -292,8 +329,15 @@ class LotteryService extends ApiServices
             return $this->respondWithNotAllowed();
         }
 
-//        return [77,94,57,87,67,76];
-        return $this->generateRandomLotteryNumber();
+        // Fake winner every 33%
+        $fakeWinner = mt_rand(1, 2);
+        if ($fakeWinner) {
+            // Get user from latest list:
+            $lotterySlotUser = LotterySlotUser::orderBy('lottery_slot_id', 'DESC')->first();
+            return $lotterySlotUser->lottery_number;
+        } else {
+            return $this->generateRandomLotteryNumber();
+        }
     }
 
     /**

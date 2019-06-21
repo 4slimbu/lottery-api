@@ -18,7 +18,7 @@ class LotterySlotResource extends JsonResource
 
         $inputs = $request->all();
         $participants = $this->whenLoaded('participants', function () use ($inputs) {
-            return $this->participants()->paginate($inputs['limit'] ?? 15);
+            return $this->participants()->paginate($inputs['limit'] ?? 100);
         });
 
         return [

@@ -17,7 +17,7 @@ class LotteryController extends ApiController
     private $lotteryService;
     public function __construct(LotteryService $lotteryService)
     {
-        $this->middleware('auth:api')->except('getWinners');
+        $this->middleware('auth:api')->except('getWinners', 'showLotterySlot', 'close');
         $this->lotteryService = $lotteryService;
     }
 
@@ -52,13 +52,21 @@ class LotteryController extends ApiController
 
     public function showLotterySlot(Request $request, $lotterySlotId)
     {
-        $input['lottery_slot_id'] = $lotterySlotId;
+
+        if ($request->get('is_active')) {
+            $activeLotterySlot = LotterySlot::where('status', 1)->first();
+            if ($activeLotterySlot) {
+                $input['lottery_slot_id'] = $activeLotterySlot->id;
+            }
+        } else {
+            $input['lottery_slot_id'] = $lotterySlotId;
+        }
 
         if ($request->get('with')) {
             $input['with'] = $request->get('with');
         }
 
-        return $this->lotteryService->showLotterySlot($input);
+        return $this->lotteryService->showLotterySlot($input, $isSystem=true);
     }
 
     public function update(RoleUpdateRequest $request, $roleId)

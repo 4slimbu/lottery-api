@@ -20,7 +20,8 @@ class LotterySlot extends Model
     public function participants()
     {
         return $this->belongsToMany(User::class)
-            ->withPivot('lottery_slot_id', 'lottery_number', 'lottery_winner_type_id', 'won_amount', 'service_charge')->orderBy('lottery_winner_type_id', 'DESC');
+//            ->withPivot('lottery_slot_id', 'lottery_number', 'lottery_winner_type_id', 'won_amount', 'service_charge')->orderBy('lottery_winner_type_id', 'DESC');
+            ->withPivot('lottery_slot_id', 'lottery_number', 'lottery_winner_type_id', 'won_amount', 'service_charge')->orderBy('created_at', 'DESC');
     }
 
     public function winners()
