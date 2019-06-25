@@ -45,6 +45,14 @@ Route::prefix('v1')->namespace('\App\Acme\Controllers')->group(function() {
     Route::delete('settings', 'SettingController@destroyMultiple');
     Route::delete('settings/{settingId}', 'SettingController@destroy')->where('settingId', '[0-9]+');
 
+    // Currencies
+    Route::get('currencies', 'CurrencyController@index');
+    Route::post('currencies', 'CurrencyController@create');
+    Route::get('currencies/{currencyId}', 'CurrencyController@show')->where('currencyId', '[0-9]+');
+    Route::put('currencies/{currencyId}', 'CurrencyController@update')->where('currencyId', '[0-9]+');
+    Route::delete('currencies', 'CurrencyController@destroyMultiple');
+    Route::delete('currencies/{currencyId}', 'CurrencyController@destroy')->where('currencyId', '[0-9]+');
+
     // Lottery
     Route::get('lottery/slots', 'LotteryController@index');
     Route::post('lottery/slots', 'LotteryController@create');
