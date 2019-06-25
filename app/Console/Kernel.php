@@ -33,7 +33,8 @@ class Kernel extends ConsoleKernel
 
             $dt = Carbon::now();
 
-            $x=60 * 5/$seconds;
+            //run for 45 mins
+            $x=60 * 45/$seconds;
 
             do{
                 // do your function here that takes between 3 and 4 seconds

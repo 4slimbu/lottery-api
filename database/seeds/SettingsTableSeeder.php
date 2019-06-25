@@ -64,7 +64,7 @@ class SettingsTableSeeder extends Seeder
             [
                 'key' => 'lottery_slot_run_duration',
                 'label' => 'Slot Run Duration (in mins)',
-                'value' => 5,
+                'value' => 1,
                 'field' => 'text',
                 'field_value' => '',
                 'created_at' => date("Y-m-d H:i:s"),
