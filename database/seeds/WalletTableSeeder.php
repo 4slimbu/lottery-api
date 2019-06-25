@@ -19,7 +19,7 @@ class WalletTableSeeder extends Seeder
     {
         DB::table('wallets')->truncate();
 
-        $users = User::whereNotIn('id', [1, 2, 3])->get();
+        $users = User::get();
 
         $faker = Faker\Factory::create();
 

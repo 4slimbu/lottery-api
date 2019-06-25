@@ -32,6 +32,7 @@ class UserResource extends JsonResource
             'profile_pic' => (string)$profilePicture,
             'is_active' => (bool)$this->is_active,
             'roles' => RoleResource::collection($this->whenLoaded('roles')),
+            'wallet' => $this->wallet
         ];
     }
 }

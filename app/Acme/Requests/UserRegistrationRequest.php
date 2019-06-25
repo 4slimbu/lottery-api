@@ -27,7 +27,7 @@ class UserRegistrationRequest extends ApiRequest
             'last_name' => 'string|nullable',
             'email' => 'required|string',
             'password' => 'required|string|min:8|max:20',
-            'gender' => 'required|string',
+            'gender' => 'string',
             'contact_number' => 'required|string',
             'device_id' => 'string',
             'preferences' => 'array',
