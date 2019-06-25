@@ -37,6 +37,14 @@ Route::prefix('v1')->namespace('\App\Acme\Controllers')->group(function() {
     Route::delete('permissions', 'PermissionController@destroyMultiple');
     Route::delete('permissions/{permissionId}', 'PermissionController@destroy')->where('permissionId', '[0-9]+');
 
+    // Settings
+    Route::get('settings', 'SettingController@index');
+    Route::post('settings', 'SettingController@create');
+    Route::get('settings/{settingId}', 'SettingController@show')->where('settingId', '[0-9]+');
+    Route::put('settings/{settingId}', 'SettingController@update')->where('settingId', '[0-9]+');
+    Route::delete('settings', 'SettingController@destroyMultiple');
+    Route::delete('settings/{settingId}', 'SettingController@destroy')->where('settingId', '[0-9]+');
+
     // Lottery
     Route::get('lottery/slots', 'LotteryController@index');
     Route::post('lottery/slots', 'LotteryController@create');
