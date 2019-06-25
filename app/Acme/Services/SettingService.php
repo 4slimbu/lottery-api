@@ -13,10 +13,6 @@ class SettingService extends ApiServices
 
     public function getSettings($input)
     {
-        if (! $this->currentUserCan('getSettings')) {
-            return $this->respondWithNotAllowed();
-        }
-
         if (isset($input['with']) && $input['with'] === 'permissions') {
             $query = Setting::with('permissions')->filter($input);
         } else {

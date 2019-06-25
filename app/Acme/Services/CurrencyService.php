@@ -13,10 +13,6 @@ class CurrencyService extends ApiServices
 
     public function getCurrencies($input)
     {
-        if (! $this->currentUserCan('getCurrencies')) {
-            return $this->respondWithNotAllowed();
-        }
-
         $currencies = Currency::get();
         return CurrencyResource::collection($currencies);
     }

@@ -5,7 +5,6 @@ namespace App\Acme\Controllers;
 use App\Acme\Requests\SettingCreateRequest;
 use App\Acme\Requests\SettingDestroyMultipleRequest;
 use App\Acme\Requests\SettingGetRequest;
-use App\Acme\Requests\SettingUpdateMultipleRequest;
 use App\Acme\Requests\SettingUpdateRequest;
 use App\Acme\Services\SettingService;
 use Illuminate\Http\Request;
@@ -15,7 +14,7 @@ class SettingController extends ApiController
     private $settingService;
     public function __construct(SettingService $settingService)
     {
-        $this->middleware('auth:api')->except('checkEmail');
+        $this->middleware('auth:api')->except('index');
         $this->settingService = $settingService;
     }
 
@@ -42,12 +41,6 @@ class SettingController extends ApiController
         $input = $request->getInput();
         $input['setting_id'] = $settingId;
         return $this->settingService->updateSetting($input);
-    }
-
-    public function updateMultiple(SettingUpdateMultipleRequest $request)
-    {
-        $input = $request->getInput();
-        return $this->settingService->updateMultipleSetting($input);
     }
 
     public function destroy($settingId)
