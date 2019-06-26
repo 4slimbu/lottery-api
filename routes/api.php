@@ -59,6 +59,7 @@ Route::prefix('v1')->namespace('\App\Acme\Controllers')->group(function() {
     Route::post('lottery/slots/close', 'LotteryController@close');
     Route::post('lottery/slots/add-participant', 'LotteryController@addParticipant');
     Route::get('lottery/slots/winners', 'LotteryController@getWinners');
+    Route::get('lottery/slots/last', 'LotteryController@getLastResult');
     Route::get('lottery/slots/{lotterySlotId}', 'LotteryController@showLotterySlot')->where('lotterySlotId', '[0-9]+');
     Route::put('lottery/slots/{lotterySlotId}', 'LotteryController@update')->where('lotterySlotId', '[0-9]+');
     Route::delete('lottery/slots', 'LotteryController@destroyMultiple');
@@ -66,6 +67,7 @@ Route::prefix('v1')->namespace('\App\Acme\Controllers')->group(function() {
 
     // Me
     Route::get('me', 'MeController@show');
+    Route::post('me/play', 'MeController@play');
     Route::post('me', 'MeController@update');
     Route::put('me/update-email', 'MeController@updateEmail');
     Route::put('me/reset-password', 'MeController@resetPassword');

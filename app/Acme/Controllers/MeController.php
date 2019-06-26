@@ -6,6 +6,7 @@ use App\Acme\Requests\MeResetPasswordRequest;
 use App\Acme\Requests\MeUpdateEmailRequest;
 use App\Acme\Requests\MeUpdateRequest;
 use App\Acme\Services\MeService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
 class MeController extends ApiController
@@ -21,6 +22,12 @@ class MeController extends ApiController
     public function show()
     {
         return $this->meService->getMyDetails();
+    }
+
+    public function play(Request $request)
+    {
+        $inputs['lottery_number'] = $request->get('lottery_number');
+        return $this->meService->play($inputs);
     }
 
     public function update(MeUpdateRequest $request)

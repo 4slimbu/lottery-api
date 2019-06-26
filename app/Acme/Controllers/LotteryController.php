@@ -44,6 +44,11 @@ class LotteryController extends ApiController
         return $this->lotteryService->addParticipantToActiveLotterySlot($userId);
     }
 
+    public function getLastResult()
+    {
+        return $this->lotteryService->getLastResult();
+    }
+
     public function getWinners(LotteryWinnerGetRequest $request)
     {
         $input = $request->getFilter();

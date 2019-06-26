@@ -208,16 +208,12 @@ class LotteryService extends ApiServices
             'has_winner' => $winnersCount > 0 ? 1 : 0
         ]);
 
-        // Fire lottery slot result generated event
-//        event(new LotterySlotResultGeneratedEvent($activeLotterySlot));
-
+        $activeLotterySlot->load('winners');
         $data = [
-            'result' => $activeLotterySlot->result,
-            'has_winner' => $activeLotterySlot->has_winner
+            'lastSlot' => $activeLotterySlot,
             ];
 
         if ($winnersCount > 0) {
-            $data['last_winners'] = $activeLotterySlot->winners->toArray();
             // Get all winners list
             $winners = LotterySlotUser::where('lottery_winner_type_id', '!=', null)
                 ->orderBy('lottery_slot_id', 'DESC')->paginate(15);
@@ -231,7 +227,7 @@ class LotteryService extends ApiServices
         return $this->setStatusCode(200)->respondWithSuccess();
     }
 
-    public function addParticipantToActiveLotterySlot($userId, $isSystem = false)
+    public function addParticipantToActiveLotterySlot($userId, $isSystem = false, $inputs = [])
     {
         if (! $userId) {
             return $this->respondWithNotAllowed();
@@ -269,11 +265,18 @@ class LotteryService extends ApiServices
             return $this->setStatusCode(400)->respondWithError('Transaction Failed', 'transactionFailed');
         }
 
+        // get lottery number
+        if (isset($inputs['lottery_number'])) {
+            $lotteryNumber = $inputs['lottery_number'];
+        } else {
+            $lotteryNumber = $this->generateRandomLotteryNumber();
+        }
+
         // Add participant
         $lotterySlotUser = LotterySlotUser::create([
             'lottery_slot_id' => $activeLotterySlot->id,
             'user_id' => $user->id,
-            'lottery_number' => $this->generateRandomLotteryNumber(),
+            'lottery_number' => $lotteryNumber,
         ]);
 
         // Update Lottery Slot participants count and total amount
@@ -322,22 +325,23 @@ class LotteryService extends ApiServices
         return LotterySlotUserResource::collection($winners);
     }
 
-
     public function generateResult($isSystem = false)
     {
         if (!$isSystem && !$this->currentUserCan('generateResult')) {
             return $this->respondWithNotAllowed();
         }
 
-        // Fake winner every 33%
-        $fakeWinner = mt_rand(1, 2);
-        if ($fakeWinner) {
-            // Get user from latest list:
-            $lotterySlotUser = LotterySlotUser::orderBy('lottery_slot_id', 'DESC')->first();
-            return $lotterySlotUser->lottery_number;
-        } else {
-            return $this->generateRandomLotteryNumber();
-        }
+        return [1, 2, 3, 4, 5, 6];
+
+//        // Fake winner every 33%
+//        $fakeWinner = mt_rand(1, 2);
+//        if ($fakeWinner) {
+//            // Get user from latest list:
+//            $lotterySlotUser = LotterySlotUser::orderBy('lottery_slot_id', 'DESC')->first();
+//            return $lotterySlotUser->lottery_number;
+//        } else {
+//            return $this->generateRandomLotteryNumber();
+//        }
     }
 
     /**
@@ -440,6 +444,20 @@ class LotteryService extends ApiServices
             $this->addParticipantToActiveLotterySlot($newFakeUser->id, $isSystem);
         }
 
+    }
+
+    public function getLastResult($isSystem = false)
+    {
+        // Get last lottery slot
+        $lastLotterySlot = null;
+        $winners = null;
+        $lastTwoLotterySlot = LotterySlot::orderBy('id', 'DESC')->limit(2)->get();
+        $lastLotterySlot = $lastTwoLotterySlot->last();
+
+        $lastLotterySlot->load('winners');
+        return [
+            "data" => $lastLotterySlot
+        ];
     }
 
 }

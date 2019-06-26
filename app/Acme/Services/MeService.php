@@ -78,4 +78,12 @@ class MeService extends ApiServices
 
         return new UserResource($user);
     }
+
+    public function play($inputs)
+    {
+        $user = auth()->user();
+        $lotteryService = new LotteryService();
+
+        return $lotteryService->addParticipantToActiveLotterySlot($user->id, true, $inputs);
+    }
 }
