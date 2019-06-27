@@ -23,6 +23,11 @@ class LotterySlotUser extends Model
 
     public $timestamps = false;
 
+    public function lotterySlot()
+    {
+        return $this->belongsTo(LotterySlot::class);
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

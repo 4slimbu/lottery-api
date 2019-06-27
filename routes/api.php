@@ -68,29 +68,10 @@ Route::prefix('v1')->namespace('\App\Acme\Controllers')->group(function() {
     // Me
     Route::get('me', 'MeController@show');
     Route::post('me/play', 'MeController@play');
-    Route::post('me', 'MeController@update');
-    Route::put('me/update-email', 'MeController@updateEmail');
-    Route::put('me/reset-password', 'MeController@resetPassword');
-
-    // Posts
-    Route::get('posts', 'PostController@index');
-    Route::post('posts', 'PostController@create');
-    Route::post('posts/{postId}', 'PostController@update');
-    Route::get('posts/{postId}', 'PostController@show');
-    Route::delete('posts/{postId}', 'PostController@destroy');
-
-    // Comments
-    Route::get('comments/{postId}', 'CommentController@index');
-    Route::post('comments', 'CommentController@create');
-    Route::get('mycomments', 'CommentController@myComments');
-    Route::put('comments/{commentId}', 'CommentController@update');
-    Route::get('commentId/{commentId}', 'CommentController@show');
-    Route::delete('comments/{commentId}', 'CommentController@destroy');
-
-    // Locations
-    Route::get('locations', 'LocationController@index');
-
-    // Category
-    Route::get('categories', 'CategoryController@index');
-
+    Route::get('me/played-games', 'MeController@getPlayedGames');
+    Route::get('me/transactions', 'MeController@getTransactions');
+    Route::post('me/create-withdraw-request', 'MeController@createWithdrawRequest');
+    Route::put('me/cancel-withdraw-request/{withdrawRequestId}', 'MeController@cancelWithdrawRequest');
+    Route::get('me/profile', 'MeController@profile');
+    Route::put('me/profile', 'MeController@profile');
 });
