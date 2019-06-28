@@ -5,6 +5,7 @@ namespace App\Acme\Controllers;
 use App\Acme\Requests\MeCreateWithdrawRequest;
 use App\Acme\Requests\MeGetPlayedGamesRequest;
 use App\Acme\Requests\MeGetTransactionsRequest;
+use App\Acme\Requests\MeGetWithdrawRequestsRequest;
 use App\Acme\Requests\MeResetPasswordRequest;
 use App\Acme\Requests\MeUpdateEmailRequest;
 use App\Acme\Requests\MeUpdateRequest;
@@ -90,5 +91,11 @@ class MeController extends ApiController
     public function cancelWithdrawRequest($withdrawRequestId)
     {
         return $this->meService->cancelWithdrawRequest($withdrawRequestId);
+    }
+
+    public function getWithdrawRequests(MeGetWithdrawRequestsRequest $request)
+    {
+        $input = $request->getWithdrawRequestsFilter();
+        return $this->meService->getWithdrawRequests($input);
     }
 }

@@ -312,17 +312,16 @@ class LotteryService extends ApiServices
         return LotterySlotUserResource::collection($winners);
     }
 
-    public function getActiveSlot($input, $isSystem = false)
+    public function getActiveSlot()
     {
-        if (!$isSystem && !$this->currentUserCan('getActiveSlot')) {
-            return $this->respondWithNotAllowed();
+        // Get Active Lottery Slot
+        $activeSlot = LotterySlot::where('status', 1)->first();
+
+        if (! $activeSlot) {
+            return $this->respondNotFound();
         }
 
-        // Get all winners list
-        $query = LotterySlot::where('status', 1)->first();
-
-        $winners = $query->paginate($input['limit'] ?? 15);
-        return LotterySlotUserResource::collection($winners);
+        return new LotterySlotResource($activeSlot);
     }
 
     public function generateResult($isSystem = false)

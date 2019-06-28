@@ -144,4 +144,13 @@ class MeService extends ApiServices
 
         return new WithdrawRequestResource($withdrawRequest);
     }
+
+    public function getWithdrawRequests($inputs)
+    {
+        $user = auth()->user();
+
+        $walletTransactions = WithdrawRequest::where('user_id', $user->id)->paginate($inputs['limit'] ?? 15);
+
+        return WithdrawRequestResource::collection($walletTransactions);
+    }
 }

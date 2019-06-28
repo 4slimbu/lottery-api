@@ -60,6 +60,7 @@ Route::prefix('v1')->namespace('\App\Acme\Controllers')->group(function() {
     Route::post('lottery/slots/add-participant', 'LotteryController@addParticipant');
     Route::get('lottery/slots/winners', 'LotteryController@getWinners');
     Route::get('lottery/slots/last', 'LotteryController@getLastResult');
+    Route::get('lottery/slots/active', 'LotteryController@getActiveSlot');
     Route::get('lottery/slots/{lotterySlotId}', 'LotteryController@showLotterySlot')->where('lotterySlotId', '[0-9]+');
     Route::put('lottery/slots/{lotterySlotId}', 'LotteryController@update')->where('lotterySlotId', '[0-9]+');
     Route::delete('lottery/slots', 'LotteryController@destroyMultiple');
@@ -70,6 +71,7 @@ Route::prefix('v1')->namespace('\App\Acme\Controllers')->group(function() {
     Route::post('me/play', 'MeController@play');
     Route::get('me/played-games', 'MeController@getPlayedGames');
     Route::get('me/transactions', 'MeController@getTransactions');
+    Route::get('me/withdraw-requests', 'MeController@getWithdrawRequests');
     Route::post('me/create-withdraw-request', 'MeController@createWithdrawRequest');
     Route::put('me/cancel-withdraw-request/{withdrawRequestId}', 'MeController@cancelWithdrawRequest');
     Route::get('me/profile', 'MeController@profile');
