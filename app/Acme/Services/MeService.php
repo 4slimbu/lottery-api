@@ -116,7 +116,7 @@ class MeService extends ApiServices
     {
         $user = auth()->user();
 
-        if ($user->wallet->withdrawable_amount < $input['amount']) {
+        if ($user->wallet->won < $input['amount']) {
             return $this->respondWithError('Insufficient balance', 'InsufficientBalance')->setStatusCode(400);
         };
 
@@ -133,6 +133,12 @@ class MeService extends ApiServices
         $withdrawRequest->fill($input);
         $withdrawRequest->save();
 
+        // Deduct withdraw request amount from won amount and put it in withdraw request amount in Wallet
+        $wallet = $user->wallet;
+        $wallet->won = $wallet->won - $input['amount'];
+        $wallet->pending_withdraw = $input['amount'];
+        $wallet->save();
+
         return new WithdrawRequestResource($withdrawRequest);
     }
 
@@ -148,6 +154,12 @@ class MeService extends ApiServices
 
         $withdrawRequest->status = "cancelled";
         $withdrawRequest->save();
+
+        // Restore pending amount to won amount in wallet
+        $wallet = $user->wallet;
+        $wallet->won = $wallet->won + $wallet->pending_withdraw;
+        $wallet->pending_withdraw = 0;
+        $wallet->save();
 
         return new WithdrawRequestResource($withdrawRequest);
     }

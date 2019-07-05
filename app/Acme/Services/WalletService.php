@@ -125,20 +125,8 @@ class WalletService extends ApiServices
         }
 
         // Sync Wallet
-        // top up should be added to usable amount
-        $usable_amount = $wallet->usable_amount + $amount;
-        // withdrawable amount is unaffected
-        $withdrawable_amount = $wallet->withdrawable_amount;
-        // pending withdraw amount is unaffected
-        $pending_withdraw_amount = $wallet->pending_withdraw_amount;
-        // topup amount is sum of new usable amount plus pending withdraw amount
-        $total_amount = $pending_withdraw_amount + $usable_amount;
-
         $wallet->update([
-            'withdrawable_amount' => $withdrawable_amount,
-            'pending_withdraw_amount' => $pending_withdraw_amount,
-            'usable_amount' => $usable_amount,
-            'total_amount' => $total_amount,
+            'deposit' => $wallet->deposit * 1 + $amount * 1,
             'updated_at' => date("Y-m-d H:i:s")
         ]);
 
@@ -162,18 +150,8 @@ class WalletService extends ApiServices
         }
 
         // Sync Wallet
-        // won amount should be added to usable_amount
-        $usable_amount = $wallet->usable_amount + $amount;
-        // won amount is available for withdraw
-        $withdrawable_amount = $wallet->withdrawable_amount + $amount;
-        $pending_withdraw_amount = $wallet->pending_withdraw_amount;
-        $total_amount = $pending_withdraw_amount + $usable_amount;
-
         $wallet->update([
-            'withdrawable_amount' => $withdrawable_amount,
-            'pending_withdraw_amount' => $pending_withdraw_amount,
-            'usable_amount' => $usable_amount,
-            'total_amount' => $total_amount,
+            'won' => $wallet->won * 1 + $amount * 1,
             'updated_at' => date("Y-m-d H:i:s")
         ]);
 
@@ -184,7 +162,7 @@ class WalletService extends ApiServices
     public function handleOrderTransaction(Wallet $wallet, $amount)
     {
         // Check wallet and see if it meets the entry value
-        if (! $wallet->usable_amount > $amount) {
+        if (! $wallet->deposit > $amount) {
             return $this->setStatusCode(400)->respondWithError('Insufficient Fund', 'insufficientFund');
         }
 
@@ -202,19 +180,8 @@ class WalletService extends ApiServices
         }
 
         // Sync Wallet
-        // Entry fee should be deducted from usable amount
-        $usable_amount = $wallet->usable_amount - $amount;
-        // If usable amount drops below withdrawable amount, it should be synced
-        $withdrawable_amount = $wallet->usable_amount >= $wallet->withdrawable_amount ? $wallet->withdrawable_amount : $wallet->usable_amount;
-        $pending_withdraw_amount = $wallet->pending_withdraw_amount;
-        $total_amount = $pending_withdraw_amount + $usable_amount;
-
         $wallet->update([
-            'withdrawable_amount' => $withdrawable_amount,
-            'pending_withdraw_amount' => $pending_withdraw_amount,
-            'usable_amount' => $usable_amount,
-            'total_amount' => $total_amount,
-            'updated_at' => date("Y-m-d H:i:s")
+            'deposit' => $wallet->deposit * 1 - $amount,
         ]);
 
         // Fire wallet transaction event

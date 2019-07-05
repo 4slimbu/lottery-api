@@ -257,12 +257,22 @@ class LotteryService extends ApiServices
             return $this->setStatusCode(400)->respondWithError('Duplicate Entry not allowed', 'duplicateEntry');
         }
 
-        // Handle Wallet Transaction
         $entryFee = Setting::where('key', 'lottery_slot_entry_fee')->first();
-        $transaction = (new WalletService)->handleTransaction($user->wallet, 'order', $entryFee->value);
 
-        if (! $transaction) {
-            return $this->setStatusCode(400)->respondWithError('Transaction Failed', 'transactionFailed');
+        // Skip wallet transaction for bots and user with free_games
+        if (!$user->is_bot && !$user->free_games > 0) {
+            // Handle Wallet Transaction
+            $transaction = (new WalletService)->handleTransaction($user->wallet, 'order', $entryFee->value);
+
+            if (! $transaction) {
+                return $this->setStatusCode(400)->respondWithError('Transaction Failed', 'transactionFailed');
+            }
+        }
+
+        // Decrease free games count
+        if ($user->free_games > 0) {
+            $user->free_games = $user->free_games - 1;
+            $user->save();
         }
 
         // get lottery number
@@ -281,7 +291,13 @@ class LotteryService extends ApiServices
 
         // Update Lottery Slot participants count and total amount
         $participantsCount = $activeLotterySlot->participants()->count();
-        $totalAmount = $activeLotterySlot->total_amount + $entryFee->value;
+
+        // Add entry fee to lottery amount only for paid users
+        if (!$user->is_bot && !$user->free_games > 0) {
+            $totalAmount = $activeLotterySlot->total_amount + $entryFee->value;
+        } else {
+            $totalAmount = $activeLotterySlot->total_amount;
+        }
 
         $activeLotterySlot->update([
             'total_participants' => $participantsCount,

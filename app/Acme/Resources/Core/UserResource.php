@@ -31,6 +31,7 @@ class UserResource extends JsonResource
             'verified' => (bool)$this->verified,
             'profile_pic' => (string)$profilePicture,
             'is_active' => (bool)$this->is_active,
+            'free_games' => (integer) $this->free_games,
             'roles' => RoleResource::collection($this->whenLoaded('roles')),
             'wallet' => $this->wallet
         ];

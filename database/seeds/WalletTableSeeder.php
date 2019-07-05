@@ -24,16 +24,15 @@ class WalletTableSeeder extends Seeder
         $faker = Faker\Factory::create();
 
         foreach ($users as $user) {
-            $withdrawableAmount = $faker->randomElement([0, 0, 50, 75, 100, 125, 150]);
-            $pendingWithdrawableAmount = $faker->randomElement([0, 0, 50, 75, 100, 125, 150]);
-            $usableAmount = $withdrawableAmount + 10000;
+            $won = $faker->randomElement([0, 0, 50, 75, 100, 125, 150]);
+            $pendingWithdraw = $faker->randomElement([0, 0, 50, 75, 100, 125, 150]);
+            $deposit = 10000;
 
             Wallet::create([
                 'user_id' => $user->id,
-                'withdrawable_amount' => $withdrawableAmount,
-                'pending_withdraw_amount' => $pendingWithdrawableAmount,
-                'usable_amount' => $usableAmount,
-                'total_amount' => $usableAmount + $pendingWithdrawableAmount,
+                'won' => $won,
+                'pending_withdraw' => $pendingWithdraw,
+                'deposit' => $deposit,
                 'created_at' => date("Y-m-d H:i:s"),
                 'updated_at' => date("Y-m-d H:i:s"),
             ]);
