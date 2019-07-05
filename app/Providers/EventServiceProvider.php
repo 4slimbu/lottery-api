@@ -24,6 +24,7 @@ class EventServiceProvider extends ServiceProvider
         'App\Acme\Events\Registration\UserVerifyEvent' => [
             'App\Acme\Listeners\Registration\SendVerificationEmailListener',
         ],
+        'App\Acme\Events\UserUpdateEvent' => [],
         // Lottery Events
         'App\Events\LotterySlotClosedEvent' => [],
         'App\Events\LotterySlotCreatedEvent' => [],

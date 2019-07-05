@@ -2,7 +2,6 @@
 
 namespace App\Acme\Services;
 
-use App\Acme\Events\UserUpdatedEmailEvent;
 use App\Acme\Models\LotterySlotUser;
 use App\Acme\Models\User;
 use App\Acme\Models\UserEmailReset;
@@ -13,6 +12,7 @@ use App\Acme\Resources\LotterySlotUserResource;
 use App\Acme\Resources\WalletTransactionResource;
 use App\Acme\Resources\WithdrawRequestResource;
 use App\Acme\Traits\ApiResponseTrait;
+use App\Events\UserUpdateEvent;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 
@@ -63,7 +63,7 @@ class MeService extends ApiServices
             'token' => $token,
         ]);
 
-        event(new UserUpdatedEmailEvent($user, $token, $input['email']));
+//        event(new UserUpdatedEmailEvent($user, $token, $input['email']));
 
         return [
             'data' => [
@@ -118,6 +118,13 @@ class MeService extends ApiServices
 
         if ($user->wallet->withdrawable_amount < $input['amount']) {
             return $this->respondWithError('Insufficient balance', 'InsufficientBalance')->setStatusCode(400);
+        };
+
+        $pendingWithdrawRequest = WithdrawRequest::where('user_id', $user->id)
+            ->where('status', 'pending')->orWhere('status', 'processing')->first();
+
+        if ($pendingWithdrawRequest) {
+            return $this->respondWithError('Pending Withdraw request already exist', 'PendingWithdrawRequestExists')->setStatusCode(400);
         };
 
         $input['user_id'] = $user->id;

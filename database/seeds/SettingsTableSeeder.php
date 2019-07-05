@@ -37,7 +37,7 @@ class SettingsTableSeeder extends Seeder
             [
                 'key' => 'app_currency',
                 'label' => 'Currency',
-                'value' => 'USD',
+                'value' => 'BTC',
                 'field' => 'text',
                 'field_value' => '',
                 'created_at' => date("Y-m-d H:i:s"),
