@@ -3,6 +3,7 @@
 namespace App\Acme\Services;
 
 use App\Acme\Events\Registration\RoleForgotPasswordEvent;
+use App\Acme\Resources\WalletResource;
 use App\Events\WalletTransactionEvent;
 use App\Acme\Exceptions\ServerErrorException;
 use App\Acme\Models\LotterySlot;
@@ -30,9 +31,16 @@ class WalletService extends ApiServices
      * ========================================
      */
 
-    public function getWallets()
+    public function getWallets($input)
     {
+        if (! $this->currentUserCan('getWallets')) {
+            return $this->respondWithNotAllowed();
+        }
 
+        $query = Wallet::filter($input);
+
+        $lotterySlots = $query->paginate($input['limit'] ?? 15);
+        return WalletResource::collection($lotterySlots);
     }
 
     public function showWallet()
