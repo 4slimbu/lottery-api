@@ -5,6 +5,7 @@ namespace App\Acme\Services;
 use App\Acme\Events\Registration\UserRegisteredEvent;
 use App\Acme\Events\Registration\UserVerifyEvent;
 use App\Acme\Models\User;
+use App\Acme\Models\Wallet;
 use App\Acme\Resources\Core\UserResource;
 use App\Acme\Traits\ApiResponseTrait;
 use App\Acme\Traits\MediaUploadTrait;
@@ -30,6 +31,8 @@ class AuthService extends ApiServices
 
         $input['password'] = bcrypt($input['password']);
         $input['email_token'] = str_limit( md5($input['email']. str_random()), 8, '');
+        // Give 5 free games to new user
+        $input['free_games'] = 5;
         $user = User::create($input);
 
         // Add media to user
@@ -45,6 +48,39 @@ class AuthService extends ApiServices
         } else {
             $user->roles()->sync(3);
         }
+
+        event(new UserRegisteredEvent($user));
+        return $this->login($loginInput);
+    }
+
+    public function registerAsGuest($input)
+    {
+        $userInDb = User::email($input['email'])->first();
+
+        if (!empty($userInDb)) {
+            return $this->respondWithError('User already exists.', 'UserExistsException')->setStatusCode(400);
+        }
+
+        $randomPassword = $this->randomPassword();
+        $loginInput = [
+            'email' => $input['email'],
+            'password' => $randomPassword
+        ];
+
+        $input['first_name'] = 'Guest';
+        $input['password'] = bcrypt($randomPassword);
+        $input['email_token'] = str_limit( md5($input['email']. str_random()), 8, '');
+        // Give 5 free games to new user
+        $input['free_games'] = 5;
+        $user = User::create($input);
+
+        // Assign player role to new user user
+        $user->roles()->sync(3);
+
+        // Create wallet for user
+        Wallet::create([
+            'user_id' => $user->id
+        ]);
 
         event(new UserRegisteredEvent($user));
         return $this->login($loginInput);
@@ -105,5 +141,16 @@ class AuthService extends ApiServices
         $user->save();
 
         event(new UserVerifyEvent($user, $email_token));
+    }
+
+    private function randomPassword() {
+        $alphabet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890';
+        $pass = array(); //remember to declare $pass as an array
+        $alphaLength = strlen($alphabet) - 1; //put the length -1 in cache
+        for ($i = 0; $i < 8; $i++) {
+            $n = rand(0, $alphaLength);
+            $pass[] = $alphabet[$n];
+        }
+        return implode($pass); //turn the array into a string
     }
 }

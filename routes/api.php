@@ -4,6 +4,7 @@ Route::prefix('v1')->namespace('\App\Acme\Controllers')->group(function() {
     Route::post('coinbase/create-charge', 'CoinbaseController@createCharge');
 
     Route::post('register', 'AuthController@register');
+    Route::post('register-as-guest', 'AuthController@registerAsGuest');
     Route::post('login', 'AuthController@login');
     Route::put('logout', 'AuthController@logout');
     Route::post('forgot-password', 'AuthController@forgotPassword');

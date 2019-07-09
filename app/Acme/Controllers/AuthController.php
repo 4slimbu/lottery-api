@@ -5,6 +5,7 @@ namespace App\Acme\Controllers;
 use App\Acme\Models\User;
 use App\Acme\Requests\UserForgotPasswordRequest;
 use App\Acme\Requests\LoginRequest;
+use App\Acme\Requests\UserGuestRegistrationRequest;
 use App\Acme\Requests\UserResetEmailRequest;
 use App\Acme\Requests\UserResetPasswordRequest;
 use App\Acme\Requests\UserRegistrationRequest;
@@ -32,6 +33,12 @@ class AuthController extends ApiController
     {
         $input = $request->getInput();
         return $this->authService->register($input);
+    }
+
+    public function registerAsGuest(UserGuestRegistrationRequest $request)
+    {
+        $input = $request->getInput();
+        return $this->authService->registerAsGuest($input);
     }
 
     public function login(LoginRequest $request)
