@@ -9,7 +9,7 @@ class Setting extends Model
     protected $table = 'settings';
 
     protected $fillable = [
-        'key', 'label', 'value', 'field', 'field_value'
+        'key', 'label', 'value', 'comment'
     ];
 
     public function scopeFilter($query, $params)

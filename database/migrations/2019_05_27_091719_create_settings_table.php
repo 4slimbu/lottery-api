@@ -18,8 +18,7 @@ class CreateSettingsTable extends Migration {
 			$table->string('key')->unique();
 			$table->string('label');
 			$table->string('value');
-			$table->enum('field', ['text', 'textarea', 'select', 'radio']);
-			$table->string('field_value', 191)->default('')->comment('for select, radio');
+			$table->text('comment')->default('')->comment('Provide help on values to be inserted');
 			$table->timestamps();
 		});
 	}

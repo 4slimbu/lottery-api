@@ -19,7 +19,7 @@ class SettingService extends ApiServices
             $query = Setting::filter($input);
         }
 
-        $settings = $query->get();
+        $settings = $query->paginate($input['limit'] ?? 15);
         return SettingResource::collection($settings);
     }
 

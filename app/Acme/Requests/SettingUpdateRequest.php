@@ -22,11 +22,7 @@ class SettingUpdateRequest extends ApiRequest
     public function rules()
     {
         return [
-            'key' => 'required|string',
-            'label' => 'required|string',
             'value' => 'required|string',
-            'field' => 'required|string',
-            'field_value' => 'required|string',
         ];
     }
 }
