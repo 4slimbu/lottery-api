@@ -119,6 +119,30 @@ class CorePermissionsTableSeeder extends Seeder
                 'updated_at' => date("Y-m-d H:i:s"),
             ],
             [
+                'name' => 'getWithdrawRequests',
+                'label' => 'Get Withdraw Requests',
+                'created_at' => date("Y-m-d H:i:s"),
+                'updated_at' => date("Y-m-d H:i:s"),
+            ],
+            [
+                'name' => 'createWithdrawRequest',
+                'label' => 'Create Withdraw Request',
+                'created_at' => date("Y-m-d H:i:s"),
+                'updated_at' => date("Y-m-d H:i:s"),
+            ],
+            [
+                'name' => 'updateWithdrawRequest',
+                'label' => 'Update Withdraw Request',
+                'created_at' => date("Y-m-d H:i:s"),
+                'updated_at' => date("Y-m-d H:i:s"),
+            ],
+            [
+                'name' => 'destroyWithdrawRequest',
+                'label' => 'Destroy Withdraw Request',
+                'created_at' => date("Y-m-d H:i:s"),
+                'updated_at' => date("Y-m-d H:i:s"),
+            ],
+            [
                 'name' => 'getRoles',
                 'label' => 'Get Roles',
                 'created_at' => date("Y-m-d H:i:s"),

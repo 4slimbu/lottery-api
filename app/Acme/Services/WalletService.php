@@ -3,6 +3,7 @@
 namespace App\Acme\Services;
 
 use App\Acme\Events\Registration\RoleForgotPasswordEvent;
+use App\Acme\Models\WithdrawRequest;
 use App\Acme\Resources\WalletResource;
 use App\Events\WalletTransactionEvent;
 use App\Acme\Exceptions\ServerErrorException;
@@ -219,9 +220,16 @@ class WalletService extends ApiServices
      * ==============================================
      */
 
-    public function getWithdrawRequests()
+    public function getWithdrawRequests($input)
     {
+        if (! $this->currentUserCan('getWithdrawRequests')) {
+            return $this->respondWithNotAllowed();
+        }
 
+        $query = WithdrawRequest::filter($input);
+
+        $withdrawRequests = $query->paginate($input['limit'] ?? 15);
+        return WalletResource::collection($withdrawRequests);
     }
 
     public function showWithdrawRequest()

@@ -69,8 +69,9 @@ Route::prefix('v1')->namespace('\App\Acme\Controllers')->group(function() {
     Route::delete('lottery/slots', 'LotteryController@destroyMultiple');
     Route::delete('lottery/slots/{lotterySlotId}', 'LotteryController@destroy')->where('lotterySlotId', '[0-9]+');
 
-    // Lottery
+    // Wallet
     Route::get('wallets', 'WalletController@index');
+    Route::get('wallets/withdraw-requests', 'WalletController@getWithdrawRequests');
 
     // Me
     Route::get('me', 'MeController@show');

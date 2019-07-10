@@ -3,6 +3,7 @@
 namespace App\Acme\Controllers;
 
 use App\Acme\Requests\WalletGetRequest;
+use App\Acme\Requests\WalletGetWithdrawRequest;
 use App\Acme\Services\WalletService;
 
 class WalletController extends ApiController
@@ -18,6 +19,11 @@ class WalletController extends ApiController
     {
         $input = $request->getFilter();
         return $this->walletService->getWallets($input);
+    }
+
+    public function getWithdrawRequests(WalletGetWithdrawRequest $request) {
+        $input = $request->getFilter();
+        return $this->walletService->getWithdrawRequests($input);
     }
 
 }
