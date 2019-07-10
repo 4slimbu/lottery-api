@@ -12,6 +12,11 @@ class WithdrawRequest extends Model
         'user_id', 'amount', 'status'
     ];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function scopeFilter($query, $params)
     {
         return $query;

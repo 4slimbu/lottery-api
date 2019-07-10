@@ -5,6 +5,7 @@ namespace App\Acme\Services;
 use App\Acme\Events\Registration\RoleForgotPasswordEvent;
 use App\Acme\Models\WithdrawRequest;
 use App\Acme\Resources\WalletResource;
+use App\Acme\Resources\WithdrawRequestResource;
 use App\Events\WalletTransactionEvent;
 use App\Acme\Exceptions\ServerErrorException;
 use App\Acme\Models\LotterySlot;
@@ -229,7 +230,7 @@ class WalletService extends ApiServices
         $query = WithdrawRequest::filter($input);
 
         $withdrawRequests = $query->paginate($input['limit'] ?? 15);
-        return WalletResource::collection($withdrawRequests);
+        return WithdrawRequestResource::collection($withdrawRequests);
     }
 
     public function showWithdrawRequest()
@@ -247,9 +248,16 @@ class WalletService extends ApiServices
 
     }
 
-    public function updateMultipleWithdrawRequest()
+    public function updateMultipleWithdrawRequest($input)
     {
+        if (!$this->currentUserCan('updateWithdrawRequest')) {
+            return $this->respondWithNotAllowed();
+        }
 
+        $withdrawRequestIds = $input['withdraw_request_ids'];
+        unset($input['withdraw_request_ids']);
+
+        WithdrawRequest::whereIn('id', $withdrawRequestIds)->update($input);
     }
 
     public function destroyWithdrawRequest()
