@@ -346,17 +346,18 @@ class LotteryService extends ApiServices
             return $this->respondWithNotAllowed();
         }
 
-        return [1, 2, 3, 4, 5, 6];
+//        return [1, 2, 3, 4, 5, 6];
 
-//        // Fake winner every 33%
+        // Fake winner every 33%
+        $fakeWinner = null;
 //        $fakeWinner = mt_rand(1, 2);
-//        if ($fakeWinner) {
-//            // Get user from latest list:
-//            $lotterySlotUser = LotterySlotUser::orderBy('lottery_slot_id', 'DESC')->first();
-//            return $lotterySlotUser->lottery_number;
-//        } else {
-//            return $this->generateRandomLotteryNumber();
-//        }
+        if ($fakeWinner) {
+            // Get user from latest list:
+            $lotterySlotUser = LotterySlotUser::orderBy('lottery_slot_id', 'DESC')->first();
+            return $lotterySlotUser->lottery_number;
+        } else {
+            return $this->generateRandomLotteryNumber();
+        }
     }
 
     /**

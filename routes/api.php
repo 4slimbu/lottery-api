@@ -74,6 +74,9 @@ Route::prefix('v1')->namespace('\App\Acme\Controllers')->group(function() {
     Route::get('wallets/withdraw-requests', 'WalletController@getWithdrawRequests');
     Route::put('wallets/withdraw-requests', 'WalletController@updateMultipleWithdrawRequest');
 
+    // Dashboard
+    Route::get('dashboard/get-stats', 'DashboardController@getStats');
+
     // Me
     Route::get('me', 'MeController@show');
     Route::post('me/play', 'MeController@play');
