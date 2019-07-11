@@ -22,9 +22,9 @@ class PageUpdateRequest extends ApiRequest
     public function rules()
     {
         return [
-            'title' => 'required|string',
-            'slug' => 'required|string',
-            'content' => 'required|string',
+            'title' => 'string',
+            'slug' => 'string',
+            'content' => 'string',
         ];
     }
 }
