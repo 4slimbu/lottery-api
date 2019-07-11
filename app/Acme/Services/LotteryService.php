@@ -178,8 +178,8 @@ class LotteryService extends ApiServices
 
 
         // check if winners exist
-        // We are only checking for whole match
-        $winners = LotterySlotUser::where('lottery_slot_id', $activeLotterySlot->id)->where('lottery_number', json_encode($result))->get();
+        $winners = $this->checkWinners($activeLotterySlot, $result);
+
         $winnersCount = count($winners);
 
         if ($winnersCount > 0) {
@@ -473,6 +473,42 @@ class LotteryService extends ApiServices
         return [
             "data" => $lastLotterySlot
         ];
+    }
+
+    public function checkWinners($activeLotterySlot, $result)
+    {
+        return LotterySlotUser::where('lottery_slot_id', $activeLotterySlot->id)
+            ->where(function($q) use ($result) {
+                $q->where('lottery_number', 'LIKE', '%[' . $result[0] . ',%')
+                    ->orWhere('lottery_number', 'LIKE', '%,' . $result[0] . ',%')
+                    ->orWhere('lottery_number', 'LIKE', '%,' . $result[0] . ']%');
+            })
+            ->where(function($q) use ($result) {
+                $q->where('lottery_number', 'LIKE', '%[' . $result[1] . ',%')
+                    ->orWhere('lottery_number', 'LIKE', '%,' . $result[1] . ',%')
+                    ->orWhere('lottery_number', 'LIKE', '%,' . $result[1] . ']%');
+            })
+            ->where(function($q) use ($result) {
+                $q->where('lottery_number', 'LIKE', '%[' . $result[2] . ',%')
+                    ->orWhere('lottery_number', 'LIKE', '%,' . $result[2] . ',%')
+                    ->orWhere('lottery_number', 'LIKE', '%,' . $result[2] . ']%');
+            })
+            ->where(function($q) use ($result) {
+                $q->where('lottery_number', 'LIKE', '%[' . $result[3] . ',%')
+                    ->orWhere('lottery_number', 'LIKE', '%,' . $result[3] . ',%')
+                    ->orWhere('lottery_number', 'LIKE', '%,' . $result[3] . ']%');
+            })
+            ->where(function($q) use ($result) {
+                $q->where('lottery_number', 'LIKE', '%[' . $result[4] . ',%')
+                    ->orWhere('lottery_number', 'LIKE', '%,' . $result[4] . ',%')
+                    ->orWhere('lottery_number', 'LIKE', '%,' . $result[4] . ']%');
+            })
+            ->where(function($q) use ($result) {
+                $q->where('lottery_number', 'LIKE', '%[' . $result[5] . ',%')
+                    ->orWhere('lottery_number', 'LIKE', '%,' . $result[5] . ',%')
+                    ->orWhere('lottery_number', 'LIKE', '%,' . $result[5] . ']%');
+            })
+            ->get();
     }
 
 }
