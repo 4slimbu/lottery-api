@@ -8,9 +8,8 @@ use App\Acme\Resources\Core\LocationResource;
 use App\Acme\Traits\PermissionTrait;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class CurrencyResource extends JsonResource
+class PageResource extends JsonResource
 {
-    use PermissionTrait;
     /**
      * Transform the resource collection into an array.
      *
@@ -19,15 +18,16 @@ class CurrencyResource extends JsonResource
      */
     public function toArray($request)
     {
-        $currency = [
+        $page = [
             'id' => (integer)$this->id,
-            'currency' => (string)$this->currency,
-            'value_in_app_coin' => (string)$this->value_in_app_coin,
+            'title' => (string)$this->title,
+            'slug' => (string)$this->slug,
+            'content' => (string)$this->content,
             'created_at' => (string)$this->created_at,
             'updated_at' => (string)$this->updated_at,
         ];
 
-        return $currency;
+        return $page;
     }
 
 }

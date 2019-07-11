@@ -87,4 +87,11 @@ Route::prefix('v1')->namespace('\App\Acme\Controllers')->group(function() {
     Route::put('me/cancel-withdraw-request/{withdrawRequestId}', 'MeController@cancelWithdrawRequest');
     Route::get('me/profile', 'MeController@profile');
     Route::put('me/profile', 'MeController@profile');
+
+    // Pages
+    Route::get('pages', 'PageController@index');
+    Route::post('pages', 'PageController@create');
+    Route::get('pages/{pageId}', 'PageController@show')->where('pageId', '[0-9]+');
+    Route::put('pages/{pageId}', 'PageController@update')->where('pageId', '[0-9]+');
+    Route::delete('pages/{pageId}', 'PageController@destroy')->where('pageId', '[0-9]+');
 });

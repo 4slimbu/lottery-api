@@ -49,6 +49,22 @@ class SettingsTableSeeder extends Seeder
                 'updated_at' => date("Y-m-d H:i:s"),
             ],
             [
+                'key' => 'app_facebook_url',
+                'label' => 'Facebook Url',
+                'value' => 'https://facebook/bitlot',
+                'comment' => 'Url e.g: https://example.com',
+                'created_at' => date("Y-m-d H:i:s"),
+                'updated_at' => date("Y-m-d H:i:s"),
+            ],
+            [
+                'key' => 'app_twitter_url',
+                'label' => 'Twitter Url',
+                'value' => 'https://twitter/bitlot',
+                'comment' => 'Url e.g: https://example.com',
+                'created_at' => date("Y-m-d H:i:s"),
+                'updated_at' => date("Y-m-d H:i:s"),
+            ],
+            [
                 'key' => 'lottery_slot_entry_fee',
                 'label' => 'Slot Entry Fee',
                 'value' => 100,

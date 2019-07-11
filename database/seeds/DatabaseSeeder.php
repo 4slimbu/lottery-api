@@ -47,5 +47,8 @@ class DatabaseSeeder extends Seeder
         //===============Withdraw Gateway====================
         $this->call(WithdrawGatewayTableSeeder::class);
 
+        //===============Page ====================
+        $this->call(PageTableSeeder::class);
+
     }
 }
