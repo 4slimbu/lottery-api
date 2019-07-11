@@ -377,7 +377,7 @@ class LotteryService extends ApiServices
             $element = mt_rand(1, 100);
 
             // only unique number are eligible for lottery number
-            if (! in_array($element, $lotteryNumber)) {
+            if (! in_array($element, $lotteryNumber) && $element !== 100) {
                 $lotteryNumber[] = $element;
             }
         }
