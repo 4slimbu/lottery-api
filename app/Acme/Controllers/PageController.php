@@ -29,9 +29,13 @@ class PageController extends ApiController
         return $this->pageService->createPage($input);
     }
 
-    public function show($pageId)
+    public function show($pageIdOrSlug)
     {
-        $input['page_id'] = $pageId;
+        if (is_numeric($pageIdOrSlug)) {
+            $input['page_id'] = $pageIdOrSlug;
+        } else {
+            $input ['page_slug'] = $pageIdOrSlug;
+        }
         return $this->pageService->showPage($input);
     }
 

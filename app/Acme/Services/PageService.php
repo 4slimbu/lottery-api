@@ -44,11 +44,18 @@ class PageService extends ApiServices
 
     public function showPage($input)
     {
-        if (!$this->currentUserCan('getPages')) {
-            return $this->respondWithNotAllowed();
+//        if (!$this->currentUserCan('getPages')) {
+//            return $this->respondWithNotAllowed();
+//        }
+
+        if (isset($input['page_slug'])) {
+            $page = Page::where('slug', $input['page_slug'])->firstOrFail();
         }
 
-        $page = Page::findOrFail($input['page_id']);
+        if (isset($input['page_id'])) {
+            $page = Page::where('id', $input['page_id'])->firstOrFail();
+        }
+
         return new PageResource($page);
     }
 
