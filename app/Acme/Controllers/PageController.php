@@ -13,7 +13,7 @@ class PageController extends ApiController
     private $pageService;
     public function __construct(PageService $pageService)
     {
-        $this->middleware('auth:api')->except('index');
+        $this->middleware('auth:api')->except('index', 'show');
         $this->pageService = $pageService;
     }
 

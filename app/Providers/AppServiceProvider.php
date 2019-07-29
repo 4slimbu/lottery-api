@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -14,6 +15,11 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         \DB::enableQueryLog();
+
+        Validator::extend(
+            'recaptcha',
+            'App\\Validators\\Recaptcha@validate'
+        );
     }
 
     /**

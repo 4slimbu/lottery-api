@@ -65,6 +65,14 @@ class SettingsTableSeeder extends Seeder
                 'updated_at' => date("Y-m-d H:i:s"),
             ],
             [
+                'key' => 'app_email',
+                'label' => 'App Main Email',
+                'value' => 'sudip@gmail.com',
+                'comment' => 'Email',
+                'created_at' => date("Y-m-d H:i:s"),
+                'updated_at' => date("Y-m-d H:i:s"),
+            ],
+            [
                 'key' => 'lottery_slot_entry_fee',
                 'label' => 'Slot Entry Fee',
                 'value' => 100,

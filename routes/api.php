@@ -94,4 +94,7 @@ Route::prefix('v1')->namespace('\App\Acme\Controllers')->group(function() {
     Route::get('pages/{idOrSlug}', 'PageController@show');
     Route::put('pages/{pageId}', 'PageController@update')->where('pageId', '[0-9]+');
     Route::delete('pages/{pageId}', 'PageController@destroy')->where('pageId', '[0-9]+');
+
+    // Contact Us
+    Route::post('contact', 'ContactFormEntryController@create');
 });
