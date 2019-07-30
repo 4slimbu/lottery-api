@@ -26,7 +26,7 @@ class ContactFormEntryCreateRequest extends ApiRequest
             'email' => 'required|email',
             'subject' => 'required|string',
             'message' => 'required|string',
-//            'captcha_response' => 'required|recaptcha',
+            'captcha_response' => 'required|recaptcha',
         ];
     }
 }
