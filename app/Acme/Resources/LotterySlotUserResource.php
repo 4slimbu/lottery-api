@@ -24,6 +24,8 @@ class LotterySlotUserResource extends JsonResource
             'won_amount' => (string)$this->won_amount,
             'service_charge' => (string)$this->service_charge,
             'lottery_slot' => new LotterySlotResource($this->whenLoaded('lotterySlot')),
+            'created_at' => (string)$this->created_at,
+            'updated_at' => (string)$this->updated_at,
         ];
     }
 }

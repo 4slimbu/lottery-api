@@ -17,6 +17,7 @@ use App\Acme\Resources\LotterySlotResource;
 use App\Acme\Resources\LotterySlotUserResource;
 use App\Acme\Traits\ApiResponseTrait;
 use App\Acme\Traits\PermissionTrait;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -193,7 +194,8 @@ class LotteryService extends ApiServices
                 $winner->fill([
                     'lottery_winner_type_id' => 1,
                     'won_amount' => $wonAmount,
-                    'service_charge' => $serviceCharge
+                    'service_charge' => $serviceCharge,
+                    'updated_at' => Carbon::now()
                 ])->save();
 
                 $wallet = Wallet::where('user_id', $winner->user_id)->first();
@@ -287,6 +289,8 @@ class LotteryService extends ApiServices
             'lottery_slot_id' => $activeLotterySlot->id,
             'user_id' => $user->id,
             'lottery_number' => $lotteryNumber,
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now()
         ]);
 
         // Update Lottery Slot participants count and total amount

@@ -21,6 +21,7 @@ class CreateLotterySlotUserTable extends Migration {
             $table->decimal('won_amount', 13, 2)->nullable();
             $table->decimal('service_charge', 13, 2)->nullable();
             $table->primary(['lottery_slot_id','user_id']);
+            $table->timestamps();
 		});
 	}
 

@@ -3,6 +3,7 @@
 use App\Acme\Models\LotterySlot;
 use App\Acme\Models\LotterySlotUser;
 use App\Acme\Models\User;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -67,7 +68,9 @@ class LotterySlotsTableSeeder extends Seeder
                     'lottery_number' => $lotteryWinnerTypeId ? $result : $lotteryNumber,
                     'lottery_winner_type_id' => $lotteryWinnerTypeId,
                     'won_amount' => $lotteryWinnerTypeId ? $totalAmount * 0.9 : null,
-                    'service_charge' => $lotteryWinnerTypeId ? $totalAmount * 0.1 : null
+                    'service_charge' => $lotteryWinnerTypeId ? $totalAmount * 0.1 : null,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now(),
                 ]);
 
             }
