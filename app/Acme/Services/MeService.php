@@ -39,10 +39,12 @@ class MeService extends ApiServices
         $user = auth()->user();
         $user->fill($input);
 
-        if (!empty($input['new_password'])) {
-            $user->password = bcrypt($input['new_password']);
+        if (!empty($input['password'])) {
+            $user->password = bcrypt($input['password']);
         }
-//        $user->save();
+
+        $user->save();
+
         // Add media to user
         if (isset($input['profile_picture'])) {
             $this->saveProfilePicture($user, $input['profile_picture']);

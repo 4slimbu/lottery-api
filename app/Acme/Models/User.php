@@ -174,7 +174,8 @@ class User extends Authenticatable implements JWTSubject, HasMedia
     public function registerMediaConversions(Media $media = null)
     {
         $this->addMediaConversion('thumb')
-            ->width(100)
-            ->height(100);
+            ->width(150)
+            ->height(150)
+            ->nonQueued();
     }
 }
