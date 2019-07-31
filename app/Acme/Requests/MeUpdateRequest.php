@@ -27,7 +27,7 @@ class MeUpdateRequest extends ApiRequest
             "gender" => 'string',
             'contact_number' => 'string',
             'preferences' => 'array',
-            'profile_pic' => 'file|nullable',
+            'profile_picture' => 'nullable',
         ];
     }
 }

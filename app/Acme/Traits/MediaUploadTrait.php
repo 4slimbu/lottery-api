@@ -49,6 +49,8 @@ trait MediaUploadTrait
             }
         } catch (\Exception $exception) {
             // fall back silently
+            var_dump($exception->getMessage());
+            die();
         }
     }
 

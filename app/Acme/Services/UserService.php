@@ -98,6 +98,9 @@ class UserService extends ApiServices
             }
         }
 
+        // Create Wallet for user
+        $user->wallet()->create([]);
+
         return new UserResource($user->fresh());
     }
 

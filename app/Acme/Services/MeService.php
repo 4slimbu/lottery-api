@@ -12,13 +12,14 @@ use App\Acme\Resources\LotterySlotUserResource;
 use App\Acme\Resources\WalletTransactionResource;
 use App\Acme\Resources\WithdrawRequestResource;
 use App\Acme\Traits\ApiResponseTrait;
+use App\Acme\Traits\MediaUploadTrait;
 use App\Events\UserUpdateEvent;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Hash;
 
 class MeService extends ApiServices
 {
-    use ApiResponseTrait;
+    use ApiResponseTrait, MediaUploadTrait;
 
     public function getMyDetails()
     {
@@ -37,8 +38,17 @@ class MeService extends ApiServices
     {
         $user = auth()->user();
         $user->fill($input);
-        $user->save();
-        return new UserResource($user);
+
+        if (!empty($input['new_password'])) {
+            $user->password = bcrypt($input['new_password']);
+        }
+//        $user->save();
+        // Add media to user
+        if (isset($input['profile_picture'])) {
+            $this->saveProfilePicture($user, $input['profile_picture']);
+        }
+
+        return new UserResource($user->fresh());
     }
 
     public function updateMyEmail($input)

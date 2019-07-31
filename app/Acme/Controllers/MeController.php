@@ -38,17 +38,6 @@ class MeController extends ApiController
     {
         $input = $request->getInput();
 
-        if(isset($input['profile_pic']))
-        {
-            $imageName = str_random(30) . '.jpeg';
-
-            $p = Storage::disk('s3')->put('profile/' . $imageName, $input['profile_pic'], 'public');
-
-            $filePath =  'https://s3-' . config('filesystems.disks.s3.region') . '.amazonaws.com/lottery/profile/' . $imageName;
-
-            $input['profile_pic'] = $filePath;
-        }
-
         return $this->meService->updateMyDetails($input);
     }
 

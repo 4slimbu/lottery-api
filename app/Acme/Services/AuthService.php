@@ -49,6 +49,9 @@ class AuthService extends ApiServices
             $user->roles()->sync(3);
         }
 
+        // Create Wallet for user
+        $user->wallet()->create([]);
+
         event(new UserRegisteredEvent($user));
         return $this->login($loginInput);
     }
