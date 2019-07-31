@@ -23,6 +23,7 @@ Route::prefix('v1')->namespace('\App\Acme\Controllers')->group(function() {
     Route::delete('users', 'UserController@destroyMultiple');
     Route::delete('users/{userId}', 'UserController@destroy')->where('userId', '[0-9]+');
     Route::get('users/check-email', 'UserController@checkEmail');
+    Route::get('users/export', 'UserController@export');
 
     // Role
     Route::get('roles', 'RoleController@index');

@@ -11,9 +11,11 @@ use App\Acme\Resources\Core\UserResource;
 use App\Acme\Traits\ApiResponseTrait;
 use App\Acme\Traits\MediaUploadTrait;
 use App\Acme\Traits\PermissionTrait;
+use App\Exports\UsersExport;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Password;
+use Maatwebsite\Excel\Facades\Excel;
 
 class UserService extends ApiServices
 {
@@ -206,5 +208,24 @@ class UserService extends ApiServices
         $row->save();
 
         event(new UserForgotPasswordEvent($user, $short_token));
+    }
+
+    public function export()
+    {
+//        $result =  Excel::store(new UsersExport, 'users-list.csv', null, null, [
+//            'visibility' => 'private'
+//        ]);
+
+        $status = Excel::store(new UsersExport, 'public/exports/users-list.csv');
+
+        if ($status) {
+            return $this->respond([
+                "data" => [
+                    "download_url" => url('/storage/exports/users-list.csv')
+                ]
+            ])->setStatusCode(200);
+        }
+
+        return $this->respondWithError('Something went wrong.', 'UserExportFailedException')->setStatusCode(500);
     }
 }

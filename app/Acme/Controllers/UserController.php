@@ -66,4 +66,9 @@ class UserController extends ApiController
         $input['email'] = $request->email;
         return $this->userService->checkEmail($input);
     }
+
+    public function export()
+    {
+        return $this->userService->export();
+    }
 }
