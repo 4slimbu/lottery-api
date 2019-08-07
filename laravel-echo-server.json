@@ -1,5 +1,5 @@
 {
-	"authHost": "http://lottery-api.test",
+	"authHost": "http://api.krypttolotto.com",
 	"authEndpoint": "/broadcasting/auth",
 	"clients": [],
 	"database": "redis",
