@@ -27,13 +27,13 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $seconds = 5;
+        $seconds = 1;
 
         $schedule->call(function () use ($schedule, $seconds) {
 
             $dt = Carbon::now();
 
-            // run 12 times in a minute
+            // run every second
             $x=60/$seconds;
 
             do{
