@@ -14,7 +14,7 @@ class UserExportResource extends JsonResource
      */
     public function toArray($request)
     {
-        $profilePicture = url('/storage/placeholder/profile_picture.png');
+        $profilePicture = url('/images/placeholder/profile_picture.png');
         if ($this->getFirstMedia('profile')) {
             $profilePicture = $this->getFirstMedia('profile')->getFullUrl('thumb');
         }
