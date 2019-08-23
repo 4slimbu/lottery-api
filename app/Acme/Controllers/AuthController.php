@@ -44,11 +44,17 @@ class AuthController extends ApiController
     public function login(LoginRequest $request)
     {
         $input = $request->getInput();
+        return $this->authService->login($input);
+    }
+
+    public function playerLogin(LoginRequest $request)
+    {
+        $input = $request->getInput();
         if (isset($input['fb_token'])) {
             return $this->facebookLogin($input['fb_token']);
         }
 
-        return $this->authService->login($input);
+        return $this->authService->playerLogin($input);
     }
 
     // TODO: refactor this code

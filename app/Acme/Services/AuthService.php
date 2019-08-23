@@ -106,11 +106,48 @@ class AuthService extends ApiServices
         return $this->login($loginInput);
     }
 
+    // This login is for players
+    public function playerLogin($input)
+    {
+        $user = User::where('email', $input['email'])->first();
+
+        if (empty($user)) {
+            return $this->respondWithError('Login and password do not match.', 'InvalidAuthenticationException')->setStatusCode(400);
+        }
+
+        $isPlayer = $user->roles()->where('id', 3)->exists();
+        if (! $isPlayer) {
+            return $this->respondWithError('Login and password do not match.', 'InvalidAuthenticationException')->setStatusCode(400);
+        }
+
+        if (!$token = auth()->attempt($input)) {
+
+            if (empty($user->password)) {
+                return $this->respondWithError('User has a blank password.', 'UserBlankPasswordException')->setStatusCode(400);
+            }
+
+            return $this->respondWithError('Login and password do not match.', 'InvalidAuthenticationException')->setStatusCode(400);
+        }
+
+        return [
+            'token' => $token,
+            'token_type' => 'bearer',
+            'expires_in' => auth()->factory()->getTTL() * 60,
+            'user' => new UserResource(auth()->user()),
+        ];
+    }
+
+    // This login is for Admin area
     public function login($input)
     {
         $user = User::where('email', $input['email'])->first();
 
         if (empty($user)) {
+            return $this->respondWithError('Login and password do not match.', 'InvalidAuthenticationException')->setStatusCode(400);
+        }
+
+        $isPlayer = $user->roles()->where('id', 3)->exists();
+        if ($isPlayer) {
             return $this->respondWithError('Login and password do not match.', 'InvalidAuthenticationException')->setStatusCode(400);
         }
 

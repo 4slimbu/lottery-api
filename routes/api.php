@@ -6,6 +6,7 @@ Route::prefix('v1')->namespace('\App\Acme\Controllers')->group(function() {
     Route::post('register', 'AuthController@register');
     Route::post('register-as-guest', 'AuthController@registerAsGuest');
     Route::post('login', 'AuthController@login');
+    Route::post('player-login', 'AuthController@playerLogin');
     Route::put('logout', 'AuthController@logout');
     Route::post('forgot-password', 'AuthController@forgotPassword');
     Route::put('reset-password', 'AuthController@resetPassword');
