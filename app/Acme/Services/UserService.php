@@ -39,9 +39,18 @@ class UserService extends ApiServices
             return $this->respondWithNotAllowed();
         }
 
+        // If username is provided, check if username already exists
+        if (isset($input['username'])) {
+            $existingUser = User::where('username', $input['username'])->first();
+            if (!empty($existingUser)) {
+                return $this->respondWithError('Username already exists.', 'UserExistsException')->setStatusCode(400);
+            }
+        }
+
+        // check if email already exists
         $existingUser = User::email($input['email'])->first();
         if (!empty($existingUser)) {
-            return $this->respondWithError('User already exists.', 'UserExistsException')->setStatusCode(400);
+            return $this->respondWithError('Email already exists.', 'UserExistsException')->setStatusCode(400);
         }
 
         $user = new User();

@@ -18,10 +18,19 @@ class AuthService extends ApiServices
 
     public function register($input)
     {
+
+        // If username is provided, check if username already exists
+        if (isset($input['username'])) {
+            $existingUser = User::where('username', $input['username'])->first();
+            if (!empty($existingUser)) {
+                return $this->respondWithError('Username already exists.', 'UserExistsException')->setStatusCode(400);
+            }
+        }
+
         $userInDb = User::email($input['email'])->first();
 
         if (!empty($userInDb)) {
-            return $this->respondWithError('User already exists.', 'UserExistsException')->setStatusCode(400);
+            return $this->respondWithError('Email already exists.', 'UserExistsException')->setStatusCode(400);
         }
 
         $loginInput = [
@@ -58,10 +67,18 @@ class AuthService extends ApiServices
 
     public function registerAsGuest($input)
     {
+        // If username is provided, check if username already exists
+        if (isset($input['username'])) {
+            $existingUser = User::where('username', $input['username'])->first();
+            if (!empty($existingUser)) {
+                return $this->respondWithError('Username already exists.', 'UserExistsException')->setStatusCode(400);
+            }
+        }
+
         $userInDb = User::email($input['email'])->first();
 
         if (!empty($userInDb)) {
-            return $this->respondWithError('User already exists.', 'UserExistsException')->setStatusCode(400);
+            return $this->respondWithError('Email already exists.', 'UserExistsException')->setStatusCode(400);
         }
 
         $randomPassword = $this->randomPassword();
@@ -135,6 +152,7 @@ class AuthService extends ApiServices
     public function reSendVerificationCode()
     {
         $user = auth()->user();
+
         if (! $user) {
             return $this->respondWithNotAllowed();
         }
@@ -144,6 +162,8 @@ class AuthService extends ApiServices
         $user->save();
 
         event(new UserVerifyEvent($user, $email_token));
+
+        return $this->respondWithSuccess('Verification code sent.', 'verificationCodeSent');
     }
 
     private function randomPassword() {
