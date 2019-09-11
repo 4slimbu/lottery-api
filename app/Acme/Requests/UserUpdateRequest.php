@@ -23,6 +23,7 @@ class UserUpdateRequest extends ApiRequest
     {
         return [
             'username' => 'string',
+            'nickname' => 'string',
             'first_name' => 'string',
             'last_name' => 'string|nullable',
             'password' => 'string|min:8|max:20',

@@ -23,6 +23,7 @@ class MeUpdateRequest extends ApiRequest
     {
         return [
             'username' => 'string',
+            'nickname' => 'string',
             'first_name' => 'string',
             'last_name' => 'string',
             "gender" => 'string',

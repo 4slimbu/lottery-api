@@ -18,6 +18,8 @@ class LotterySlotUserResource extends JsonResource
         return [
             'lottery_slot_id' => (integer)$this->lottery_slot_id,
             'user_id' => (integer)$this->user_id,
+            'username' => (string)$this->user->username,
+            'nickname' => (string)$this->user->nickname,
             'full_name' => (string)$this->user->full_name,
             'lottery_number' => (array)$this->lottery_number,
             'lottery_winner_type_id' => (integer)$this->lottery_winner_type_id,

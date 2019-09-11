@@ -19,6 +19,7 @@ class CreateCoreUsersTable extends Migration {
 			$table->string('last_name', 191)->nullable();
 			$table->string('email', 191)->unique('UNQ_core_users_email');
 			$table->string('username', 64)->nullable()->unique('UNQ_core_users_username');
+			$table->string('nickname', 64)->nullable();
 			$table->enum('gender', array('male','female'))->nullable();
 			$table->string('contact_number')->nullable();
 			$table->string('password', 128)->default('');

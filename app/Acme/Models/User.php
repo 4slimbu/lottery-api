@@ -21,7 +21,7 @@ class User extends Authenticatable implements JWTSubject, HasMedia
     ];
 
     protected $fillable = [
-        'id', 'username', 'first_name', 'last_name', 'gender', 'contact_number', 'email',
+        'id', 'username', 'nickname', 'first_name', 'last_name', 'gender', 'contact_number', 'email',
         'password', 'verified', 'email_token',
         'profile_pic', 'fb_id', 'device_id', 'is_bot', 'free_games'
     ];

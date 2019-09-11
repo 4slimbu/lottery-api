@@ -310,7 +310,9 @@ class LotteryService extends ApiServices
 
         $participant = [
             'id' => $lotterySlotUser->id,
-            'full_name' => $lotterySlotUser->user->full_name
+            'full_name' => $lotterySlotUser->user->full_name,
+            'nickname' => $lotterySlotUser->user->nickname,
+            'username' => $lotterySlotUser->user->username,
         ];
 
         // trigger participant added event

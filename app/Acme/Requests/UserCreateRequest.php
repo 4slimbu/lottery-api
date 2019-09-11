@@ -23,6 +23,7 @@ class UserCreateRequest extends ApiRequest
     {
         return [
             'username' => 'string',
+            'nickname' => 'string',
             'first_name' => 'string|nullable',
             'last_name' => 'string|nullable',
             'email' => 'required|string',
