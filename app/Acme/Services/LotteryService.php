@@ -375,13 +375,14 @@ class LotteryService extends ApiServices
     {
         // initialize empty lottery number
         $lotteryNumber = [];
+        $maxNumber = 60;
 
         // keep generating until the length of the lottery number is 6
         while (count($lotteryNumber) < 6) {
-            $element = mt_rand(1, 100);
+            $element = mt_rand(1, $maxNumber);
 
             // only unique number are eligible for lottery number
-            if (! in_array($element, $lotteryNumber) && $element !== 100) {
+            if (! in_array($element, $lotteryNumber) && $element < $maxNumber) {
                 $lotteryNumber[] = $element;
             }
         }

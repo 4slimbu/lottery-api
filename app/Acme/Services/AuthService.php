@@ -103,7 +103,7 @@ class AuthService extends ApiServices
         ]);
 
         event(new UserRegisteredEvent($user));
-        return $this->login($loginInput);
+        return $this->playerLogin($loginInput);
     }
 
     // This login is for players
