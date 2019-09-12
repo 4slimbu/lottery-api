@@ -18,6 +18,7 @@ use App\Acme\Resources\LotterySlotUserResource;
 use App\Acme\Traits\ApiResponseTrait;
 use App\Acme\Traits\PermissionTrait;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -132,13 +133,9 @@ class LotteryService extends ApiServices
             return $this->setStatusCode(400)->respondWithError('Only one slot can be active', 'activeSlotPresent');
         }
 
-        // Check if previous lottery slot has winner
-        // If not, then transfer the amount to current lottery slot
+        // Carry over amount from previous slot
         $previousLotterySlot = LotterySlot::orderBy('id', 'DESC')->first();
-        $previousBalance = 0;
-        if (! $previousLotterySlot->has_winner) {
-            $previousBalance = $previousLotterySlot->total_amount;
-        }
+        $previousBalance = $previousLotterySlot->carry_amount;
 
         // Get config
         $entryFee = Setting::where('key', 'lottery_slot_entry_fee')->first();
@@ -177,31 +174,10 @@ class LotteryService extends ApiServices
         // generate result
         $result = $this->generateResult($isSystem);
 
-
-        // check if winners exist
-        $winners = $this->checkWinners($activeLotterySlot, $result);
+        // Handle winners
+        $winners = $this->handleWinners($activeLotterySlot, $result);
 
         $winnersCount = count($winners);
-
-        if ($winnersCount > 0) {
-            // Get config
-            $serviceChargePercent = Setting::where('key', 'lottery_slot_service_charge')->first();
-            $lotteryAmount = $activeLotterySlot->total_amount;
-            $wonAmount = ($lotteryAmount / $winnersCount) * ((100 - $serviceChargePercent->value) / 100);
-            $serviceCharge = ($lotteryAmount / $winnersCount) * ($serviceChargePercent->value / 100);
-
-            foreach ($winners as $winner) {
-                $winner->fill([
-                    'lottery_winner_type_id' => 1,
-                    'won_amount' => $wonAmount,
-                    'service_charge' => $serviceCharge,
-                    'updated_at' => Carbon::now()
-                ])->save();
-
-                $wallet = Wallet::where('user_id', $winner->user_id)->first();
-                (new WalletService)->handleTransaction($wallet, 'win', $wonAmount);
-            }
-        }
 
         // Update Lottery slot with new info
         $activeLotterySlot->update([
@@ -282,6 +258,12 @@ class LotteryService extends ApiServices
             $lotteryNumber = $inputs['lottery_number'];
         } else {
             $lotteryNumber = $this->generateRandomLotteryNumber();
+        }
+
+        // Check if user has bypass unique number validation and put repeating same number thus trying to trick the winning logic
+        // into thinking them as winner
+        if (count($lotteryNumber) !== count(array_unique($lotteryNumber))) {
+            return $this->setStatusCode(400)->respondWithError('Invalid Lottery Number', 'invalidLotteryNumber');
         }
 
         // Add participant
@@ -483,40 +465,244 @@ class LotteryService extends ApiServices
         ];
     }
 
-    public function checkWinners($activeLotterySlot, $result)
+    public function handleWinners($activeLotterySlot, $result)
     {
-        return LotterySlotUser::where('lottery_slot_id', $activeLotterySlot->id)
-            ->where(function($q) use ($result) {
-                $q->where('lottery_number', 'LIKE', '%[' . $result[0] . ',%')
-                    ->orWhere('lottery_number', 'LIKE', '%,' . $result[0] . ',%')
-                    ->orWhere('lottery_number', 'LIKE', '%,' . $result[0] . ']%');
-            })
-            ->where(function($q) use ($result) {
-                $q->where('lottery_number', 'LIKE', '%[' . $result[1] . ',%')
-                    ->orWhere('lottery_number', 'LIKE', '%,' . $result[1] . ',%')
-                    ->orWhere('lottery_number', 'LIKE', '%,' . $result[1] . ']%');
-            })
-            ->where(function($q) use ($result) {
-                $q->where('lottery_number', 'LIKE', '%[' . $result[2] . ',%')
-                    ->orWhere('lottery_number', 'LIKE', '%,' . $result[2] . ',%')
-                    ->orWhere('lottery_number', 'LIKE', '%,' . $result[2] . ']%');
-            })
-            ->where(function($q) use ($result) {
-                $q->where('lottery_number', 'LIKE', '%[' . $result[3] . ',%')
-                    ->orWhere('lottery_number', 'LIKE', '%,' . $result[3] . ',%')
-                    ->orWhere('lottery_number', 'LIKE', '%,' . $result[3] . ']%');
-            })
-            ->where(function($q) use ($result) {
-                $q->where('lottery_number', 'LIKE', '%[' . $result[4] . ',%')
-                    ->orWhere('lottery_number', 'LIKE', '%,' . $result[4] . ',%')
-                    ->orWhere('lottery_number', 'LIKE', '%,' . $result[4] . ']%');
-            })
-            ->where(function($q) use ($result) {
-                $q->where('lottery_number', 'LIKE', '%[' . $result[5] . ',%')
-                    ->orWhere('lottery_number', 'LIKE', '%,' . $result[5] . ',%')
-                    ->orWhere('lottery_number', 'LIKE', '%,' . $result[5] . ']%');
-            })
-            ->get();
+        // getWinners
+        $winners = $this->getCurrentWinners($activeLotterySlot, $result);
+        $totalAmount = $activeLotterySlot->total_amount;
+        $lotteryAmount = 0;
+        $carryAmount = $totalAmount;
+
+        // Handle transactions and data update
+        if ($winners) {
+            foreach ($winners as $typeWinners) {
+                if ($typeWinners['type'] === 'jackpot' && $typeWinners['count'] > 0) {
+                    $winnersCount = $typeWinners['count'];
+                    $lotteryAmount = $totalAmount;
+                    $carryAmount = $carryAmount - $lotteryAmount;
+                    $lotteryWinnerTypeId = 1;
+                } else {
+                    if ($typeWinners['type'] === 'fiveDigit' && $typeWinners['count'] > 0) {
+                        $winnersCount = $typeWinners['count'];
+                        // only 10% is distributed to fiveDigit winners
+                        $lotteryAmount = $activeLotterySlot->total_amount * 10 / 100;
+                        $carryAmount = $carryAmount  - $lotteryAmount;
+                        $lotteryWinnerTypeId = 2;
+                    }
+
+                    if ($typeWinners['type'] === 'fourDigit' && $typeWinners['count'] > 0) {
+                        $winnersCount = $typeWinners['count'];
+                        // only 3% is distributed to fiveDigit winners
+                        $lotteryAmount = $activeLotterySlot->total_amount * 3 / 100;
+                        $carryAmount = $carryAmount - $lotteryAmount;
+                        $lotteryWinnerTypeId = 3;
+                    }
+                }
+
+                if (isset($winnersCount) && $winnersCount > 0 && isset($lotteryWinnerTypeId) && $lotteryWinnerTypeId > 0) {
+                    // Get config
+                    $serviceChargePercent = Setting::where('key', 'lottery_slot_service_charge')->first();
+
+                    $wonAmount = ($lotteryAmount / $winnersCount) * ((100 - $serviceChargePercent->value) / 100);
+                    $serviceCharge = ($lotteryAmount / $winnersCount) * ($serviceChargePercent->value / 100);
+                    foreach ($typeWinners['winners'] as $winner) {
+                        $winner->fill([
+                            'lottery_winner_type_id' => $lotteryWinnerTypeId,
+                            'won_amount' => $wonAmount,
+                            'service_charge' => $serviceCharge,
+                            'updated_at' => Carbon::now()
+                        ])->save();
+
+                        $wallet = Wallet::where('user_id', $winner->user_id)->first();
+                        (new WalletService)->handleTransaction($wallet, 'win', $wonAmount);
+                    }
+                }
+
+            }
+        }
+
+        // Update the carry amount for active lottery slot
+        $activeLotterySlot->carry_amount = $carryAmount;
+        $activeLotterySlot->save();
+
+        return $winners;
     }
 
+    public function getCurrentWinners($activeLotterySlot, $result)
+    {
+        $winners = [];
+
+        // Get jackpot Winners
+        $jackpotWinners = $this->getJackpotWinners($activeLotterySlot, $result);
+        if ($jackpotWinners['count'] > 0) {
+            $winners[] = ['type' => 'jackpot'] + $jackpotWinners;
+
+            // If jackpot winner, then no need to distribute prize to other type of winner.
+            return $winners;
+        }
+
+        // Get five digit Winners
+        $fiveDigitWinners = $this->getFiveDigitWinners($activeLotterySlot, $result, $jackpotWinners['winnerIds']);
+
+        if ($fiveDigitWinners) {
+            $winners[] = ['type' => 'fiveDigit'] + $fiveDigitWinners;
+        }
+
+        // Get four digit Winners
+        $fourDigitWinners = $this->getFourDigitWinners($activeLotterySlot, $result, $jackpotWinners['winnerIds']->merge($fiveDigitWinners['winnerIds']));
+        if ($fourDigitWinners) {
+            $winners[] = ['type' => 'fourDigit'] + $fourDigitWinners;
+        }
+
+        return $winners;
+
+    }
+
+    public function getJackpotWinners($activeLotterySlot, $result)
+    {
+        $response = [
+            'count' => 0,
+            'winners' => collect([]),
+            'winnerIds' => collect([])
+        ];
+
+        $winners = LotterySlotUser::where('lottery_slot_id', $activeLotterySlot->id);
+
+        foreach ($result as $number) {
+            $winners->where(function($q) use ($number) {
+                $q->where('lottery_number', 'LIKE', '%[' . $number . ',%')
+                    ->orWhere('lottery_number', 'LIKE', '%,' . $number . ',%')
+                    ->orWhere('lottery_number', 'LIKE', '%,' . $number . ']%');
+            });
+        };
+
+        $winnersCount = $winners->count();
+        if ($winnersCount > 0) {
+            $response['count'] = $winnersCount;
+            $response['winners'] = $winners->get();
+            $response['winnerIds'] = $winners->pluck('user_id');
+        }
+
+        return $response;
+    }
+
+
+    public function getFiveDigitWinners($activeLotterySlot, $result, $excludeUserIds)
+    {
+        // These are the possible five indexes in result that can be matched.
+        $possibleFiveDigitCombinations = [
+            [0, 1, 2, 3, 4],
+            [0, 1, 2, 3, 5],
+            [0, 1, 2, 4, 5],
+            [0, 1, 3, 4, 5],
+            [0, 2, 3, 4, 5],
+            [1, 2, 3, 4, 5],
+        ];
+
+        return $this->combinationWinners($activeLotterySlot, $possibleFiveDigitCombinations, $result, $excludeUserIds);
+    }
+
+    public function getFourDigitWinners($activeLotterySlot, $result, $excludeUserIds)
+    {
+        $possibleFourDigitCombinations = [
+            [0, 1, 2, 3],
+            [0, 1, 2, 4],
+            [0, 1, 2, 5],
+            [0, 1, 3, 4],
+            [0, 1, 3, 5],
+            [0, 1, 4, 5],
+            [0, 2, 3, 4],
+            [0, 2, 3, 5],
+            [0, 2, 4, 5],
+            [0, 3, 4, 5],
+            [1, 2, 3, 4],
+            [1, 2, 3, 5],
+            [1, 2, 4, 5],
+            [1, 3, 4, 5],
+            [2, 3, 4, 5],
+        ];
+
+        return $this->combinationWinners($activeLotterySlot, $possibleFourDigitCombinations, $result, $excludeUserIds);
+    }
+
+    private function combinationWinners($activeLotterySlot, $possibleCombinations, $result, $excludeUserIds)
+    {
+        $response = [
+            'count' => 0,
+            'winners' => collect([]),
+            'winnerIds' => collect([])
+        ];
+
+        $winners = LotterySlotUser::where('lottery_slot_id', $activeLotterySlot->id);
+        foreach ($possibleCombinations as $index => $currentCombination) {
+            if ($index === 0) {
+                $winners->where(function($query) use ($currentCombination, $result, $excludeUserIds) {
+                    foreach ($currentCombination as $index) {
+                        $query->where(function($q) use ($result, $index) {
+                            $q->where('lottery_number', 'LIKE', '%[' . $result[$index] . ',%')
+                                ->orWhere('lottery_number', 'LIKE', '%,' . $result[$index] . ',%')
+                                ->orWhere('lottery_number', 'LIKE', '%,' . $result[$index] . ']%');
+                        });
+
+                        $query->whereNotIn('user_id', $excludeUserIds);
+                    };
+                });
+            } else {
+                $winners->orWhere(function($query) use ($currentCombination, $result, $excludeUserIds) {
+                    foreach ($currentCombination as $index) {
+                        $query->where(function($q) use ($result, $index) {
+                            $q->where('lottery_number', 'LIKE', '%[' . $result[$index] . ',%')
+                                ->orWhere('lottery_number', 'LIKE', '%,' . $result[$index] . ',%')
+                                ->orWhere('lottery_number', 'LIKE', '%,' . $result[$index] . ']%');
+                        });
+
+                        $query->whereNotIn('user_id', $excludeUserIds);
+                    };
+                });
+            }
+
+        }
+
+        $winnersCount = $winners->count();
+        if ($winnersCount > 0) {
+            $response['count'] = $winnersCount;
+            $response['winners'] = $winners->get();
+            $response['winnerIds'] = $winners->pluck('user_id');
+        }
+
+        return $response;
+    }
+
+    // Todo: make this subarray combination calculator work
+    private function getSubArray($arr, $r) {
+        // A temporary array to
+        // store all combination
+        // one by one
+        $data = array();
+        $n = count($arr);
+
+        // Print all combination
+        // using temporary array 'data[]'
+        return $this->combinationUtil($arr, $data, 0, $n - 1, 0, $r);
+    }
+
+    private function combinationUtil($arr, $data, $start, $end, $index, $r) {
+        // Current combination is ready
+        // to be printed, print it
+        if ($index == $r)
+        {
+            for ($j = 0; $j < $r; $j++) {
+                echo $data[$j];
+            }
+
+            echo " ";
+            return;
+        }
+
+        for ($i = $start; $i <= $end && $end - $i + 1 >= $r - $index; $i++) {
+            $data[$index] = $arr[$i];
+            $this->combinationUtil($arr, $data, $i + 1, $end, $index + 1, $r);
+        }
+
+    }
 }

@@ -22,6 +22,7 @@ class CreateLotterySlotsTable extends Migration {
 			$table->integer('total_participants')->unsigned()->default(0);
 			$table->decimal('entry_fee', 13, 2);
 			$table->decimal('total_amount', 13, 2)->default('0');
+			$table->decimal('carry_amount', 13, 2)->default('0');
 			$table->string('result')->nullable();
 			$table->boolean('status')->default(0);
 			$table->timestamps();

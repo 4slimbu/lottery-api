@@ -17,22 +17,22 @@ class LotteryWinnerTypesTableSeeder extends Seeder
 
         DB::table('lottery_winner_types')->insert([
             [
-                'name' => 'whole_match',
-                'label' => 'Whole Match',
+                'name' => 'jackpot',
+                'label' => 'Jackpot',
                 'status' => 1,
                 'created_at' => date("Y-m-d H:i:s"),
                 'updated_at' => date("Y-m-d H:i:s"),
             ],
             [
-                'name' => 'row_match',
-                'label' => 'Row Match',
+                'name' => 'five_digit',
+                'label' => 'Five Digit',
                 'status' => 0,
                 'created_at' => date("Y-m-d H:i:s"),
                 'updated_at' => date("Y-m-d H:i:s"),
             ],
             [
-                'name' => 'diagonal_match',
-                'label' => 'Diagonal Match',
+                'name' => 'four_digit',
+                'label' => 'Four digit',
                 'status' => 0,
                 'created_at' => date("Y-m-d H:i:s"),
                 'updated_at' => date("Y-m-d H:i:s"),

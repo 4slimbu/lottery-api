@@ -10,7 +10,7 @@ class LotterySlot extends Model
 
     protected $fillable = [
         'slot_ref', 'start_time', 'end_time', 'has_winner', 'total_participants', 'entry_fee',
-        'total_amount', 'result', 'status'
+        'total_amount', 'carry_amount', 'result', 'status'
         ];
 
     protected $casts = [
