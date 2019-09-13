@@ -120,7 +120,7 @@ class LotteryService extends ApiServices
      * Fire Lottery Slot Created Event
      *
      * @param bool $isSystem
-     * @return \Illuminate\Http\JsonResponse
+     * @return LotterySlotResource
      */
     public function createLotterySlot($isSystem = false)
     {
@@ -155,7 +155,7 @@ class LotteryService extends ApiServices
         event(new LotterySlotCreatedEvent($lotterySlot));
 
         // Return response;
-        return $this->respondWithSuccess();
+        return new LotterySlotResource($lotterySlot);
     }
 
     public function closeLotterySlot($isSystem = true)
@@ -192,7 +192,7 @@ class LotteryService extends ApiServices
         if ($winners) {
             // Get all winners list
             $winners = LotterySlotUser::where('lottery_winner_type_id', '!=', null)
-                ->orderBy('lottery_slot_id', 'DESC')->paginate(15);
+                ->orderBy('lottery_slot_id', 'DESC')->paginate(8);
             $data['winners'] = LotterySlotUserResource::collection($winners);
         }
 
@@ -200,7 +200,7 @@ class LotteryService extends ApiServices
         event(new LotterySlotClosedEvent($data));
 
         // Return closed lottery slot
-        return $this->setStatusCode(200)->respondWithSuccess();
+        return new LotterySlotResource($activeLotterySlot);
     }
 
     public function addParticipantToActiveLotterySlot($userId, $isSystem = false, $inputs = [])
@@ -338,7 +338,7 @@ class LotteryService extends ApiServices
             'resultType' => 'real', // 'real', 'fake', 'force'
             'winnerType' => 'jackpot', // 'jackpot', 'fiveDigit', 'fourDigit'
             'fakeFrequency' => 100, // will translate to 50%
-            'forceResult' => [1, 2, 3, 4, 5, 6] // will be returned as result if resultType is set to force
+            'forceResult' => [1,2,3,4,5,6] // will be returned as result if resultType is set to force
         ];
 
         // This is the real random result
@@ -511,6 +511,7 @@ class LotteryService extends ApiServices
     {
         // getWinners
         $winners = $this->getCurrentWinners($activeLotterySlot, $result);
+
         $totalAmount = $activeLotterySlot->total_amount;
         $lotteryAmount = 0;
         $carryAmount = $totalAmount;
@@ -597,7 +598,6 @@ class LotteryService extends ApiServices
         }
 
         return $winners;
-
     }
 
     public function getJackpotWinners($activeLotterySlot, $result)
@@ -675,10 +675,12 @@ class LotteryService extends ApiServices
             'winnerIds' => collect([])
         ];
 
+        // The result should be from the active lottery slot only
         $winners = LotterySlotUser::where('lottery_slot_id', $activeLotterySlot->id);
-        foreach ($possibleCombinations as $index => $currentCombination) {
-            if ($index === 0) {
-                $winners->where(function($query) use ($currentCombination, $result, $excludeUserIds) {
+
+        $winners->where(function ($wQuery) use ($possibleCombinations, $winners, $result, $excludeUserIds) {
+            foreach ($possibleCombinations as $index => $currentCombination) {
+                $wQuery->orWhere(function($query) use ($currentCombination, $result, $excludeUserIds) {
                     foreach ($currentCombination as $index) {
                         $query->where(function($q) use ($result, $index) {
                             $q->where('lottery_number', 'LIKE', '%[' . $result[$index] . ',%')
@@ -686,26 +688,16 @@ class LotteryService extends ApiServices
                                 ->orWhere('lottery_number', 'LIKE', '%,' . $result[$index] . ']%');
                         });
 
-                        $query->whereNotIn('user_id', $excludeUserIds);
-                    };
-                });
-            } else {
-                $winners->orWhere(function($query) use ($currentCombination, $result, $excludeUserIds) {
-                    foreach ($currentCombination as $index) {
-                        $query->where(function($q) use ($result, $index) {
-                            $q->where('lottery_number', 'LIKE', '%[' . $result[$index] . ',%')
-                                ->orWhere('lottery_number', 'LIKE', '%,' . $result[$index] . ',%')
-                                ->orWhere('lottery_number', 'LIKE', '%,' . $result[$index] . ']%');
-                        });
-
-                        $query->whereNotIn('user_id', $excludeUserIds);
+                        if (count($excludeUserIds)) {
+                            $query->whereNotIn('user_id', $excludeUserIds);
+                        }
                     };
                 });
             }
-
-        }
+        });
 
         $winnersCount = $winners->count();
+
         if ($winnersCount > 0) {
             $response['count'] = $winnersCount;
             $response['winners'] = $winners->get();

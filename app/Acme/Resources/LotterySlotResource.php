@@ -29,6 +29,7 @@ class LotterySlotResource extends JsonResource
             'has_winner' => (string)$this->has_winner,
             'total_participants' => (string)$this->total_participants,
             'total_amount' => (string)$this->total_amount,
+            'carry_amount' => (string)$this->carry_amount,
             'result' => (array)$this->result,
             'status' => (string)$this->status,
             'participants' => $participants

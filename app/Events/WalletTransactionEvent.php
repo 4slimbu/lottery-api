@@ -2,17 +2,12 @@
 
 namespace App\Events;
 
-use App\Acme\Models\LotterySlot;
-use App\Acme\Models\User;
 use App\Acme\Models\WalletTransaction;
-use App\Acme\Resources\LotterySlotResource;
 use Illuminate\Broadcasting\Channel;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Foundation\Events\Dispatchable;
+use Illuminate\Queue\SerializesModels;
 
 class WalletTransactionEvent implements ShouldBroadcast
 {

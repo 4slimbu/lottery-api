@@ -27,14 +27,16 @@ class EventServiceProvider extends ServiceProvider
         'App\Acme\Events\ContactFormEntryCreatedEvent' => [
             'App\Acme\Listeners\ContactFormEntryCreatedEventListener',
         ],
-        'App\Acme\Events\UserUpdateEvent' => [],
+        'App\Events\UserUpdateEvent' => [],
         // Lottery Events
         'App\Events\LotterySlotClosedEvent' => [],
         'App\Events\LotterySlotCreatedEvent' => [],
         'App\Events\LotterySlotResultGeneratedEvent' => [],
         'App\Events\ParticipantAddedEvent' => [],
         // Wallet Events
-        'App\Acme\Events\WalletTransactionEvent' => [],
+        'App\Events\WalletTransactionEvent' => [
+            'App\Listeners\WalletTransactionEventListener'
+        ],
     ];
 
     /**
