@@ -19,7 +19,7 @@ class SettingsTableSeeder extends Seeder
             [
                 'key' => 'app_name',
                 'label' => 'App Name',
-                'value' => 'Lottery',
+                'value' => 'Kryptto.io',
                 'comment' => 'Text',
                 'created_at' => date("Y-m-d H:i:s"),
                 'updated_at' => date("Y-m-d H:i:s"),

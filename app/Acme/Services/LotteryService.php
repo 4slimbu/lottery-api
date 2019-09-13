@@ -311,6 +311,8 @@ class LotteryService extends ApiServices
         $query = LotterySlotUser::where('lottery_winner_type_id', '!=', null)->orderBy('lottery_slot_id', 'DESC');
 
         $winners = $query->paginate($input['limit'] ?? 15);
+        $winners->load('lotterySlot');
+
         return LotterySlotUserResource::collection($winners);
     }
 
