@@ -177,13 +177,11 @@ class LotteryService extends ApiServices
         // Handle winners
         $winners = $this->handleWinners($activeLotterySlot, $result);
 
-        $winnersCount = count($winners);
-
         // Update Lottery slot with new info
         $activeLotterySlot->update([
             'result' => $result,
             'status' => 0,
-            'has_winner' => $winnersCount > 0 ? 1 : 0
+            'has_winner' => $winners? 1 : 0
         ]);
 
         $activeLotterySlot->load('winners');
@@ -191,7 +189,7 @@ class LotteryService extends ApiServices
             'lastSlot' => $activeLotterySlot,
             ];
 
-        if ($winnersCount > 0) {
+        if ($winners) {
             // Get all winners list
             $winners = LotterySlotUser::where('lottery_winner_type_id', '!=', null)
                 ->orderBy('lottery_slot_id', 'DESC')->paginate(15);
@@ -492,7 +490,7 @@ class LotteryService extends ApiServices
 
                     if ($typeWinners['type'] === 'fourDigit' && $typeWinners['count'] > 0) {
                         $winnersCount = $typeWinners['count'];
-                        // only 3% is distributed to fiveDigit winners
+                        // only 3% is distributed to fourDigit winners
                         $lotteryAmount = $activeLotterySlot->total_amount * 3 / 100;
                         $carryAmount = $carryAmount - $lotteryAmount;
                         $lotteryWinnerTypeId = 3;
@@ -544,13 +542,13 @@ class LotteryService extends ApiServices
         // Get five digit Winners
         $fiveDigitWinners = $this->getFiveDigitWinners($activeLotterySlot, $result, $jackpotWinners['winnerIds']);
 
-        if ($fiveDigitWinners) {
+        if ($fiveDigitWinners['count'] > 0) {
             $winners[] = ['type' => 'fiveDigit'] + $fiveDigitWinners;
         }
 
         // Get four digit Winners
         $fourDigitWinners = $this->getFourDigitWinners($activeLotterySlot, $result, $jackpotWinners['winnerIds']->merge($fiveDigitWinners['winnerIds']));
-        if ($fourDigitWinners) {
+        if ($fourDigitWinners['count'] > 0) {
             $winners[] = ['type' => 'fourDigit'] + $fourDigitWinners;
         }
 
