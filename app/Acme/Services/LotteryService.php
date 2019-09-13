@@ -332,17 +332,61 @@ class LotteryService extends ApiServices
             return $this->respondWithNotAllowed();
         }
 
-//        return [1, 2, 3, 4, 5, 6];
+        // For testing, config can be altered to get the desired result
+        // Else leave as it is
+        $config = [
+            'resultType' => 'real', // 'real', 'fake', 'force'
+            'winnerType' => 'jackpot', // 'jackpot', 'fiveDigit', 'fourDigit'
+            'fakeFrequency' => 100, // will translate to 50%
+            'forceResult' => [1, 2, 3, 4, 5, 6] // will be returned as result if resultType is set to force
+        ];
 
-        // Fake winner every 33%
-        $fakeWinner = null;
-//        $fakeWinner = mt_rand(1, 2);
-        if ($fakeWinner) {
-            // Get user from latest list:
-            $lotterySlotUser = LotterySlotUser::orderBy('lottery_slot_id', 'DESC')->first();
-            return $lotterySlotUser->lottery_number;
-        } else {
+        // This is the real random result
+        if ($config['resultType'] === 'real') {
             return $this->generateRandomLotteryNumber();
+        }
+
+        // This is for testing
+        if ($config['resultType'] === 'force') {
+            return $config['forceResult'];
+        }
+
+        // This is for testing as well
+        if ($config['resultType'] === 'fake') {
+            // get percentage of getting fake result
+            $fakeResultChance = mt_rand(0, 100) < $config['fakeFrequency'];
+
+            if ($fakeResultChance) {
+                // Generate jackpot winner
+                if ($config['winnerType'] === 'jackpot') {
+                    $lotterySlotUser = LotterySlotUser::orderBy('lottery_slot_id', 'DESC')->first();
+                    return $lotterySlotUser->lottery_number;
+                }
+
+                // Generate fiveDigit winner
+                if ($config['winnerType'] === 'fiveDigit') {
+                    $lotterySlotUser = LotterySlotUser::orderBy('lottery_slot_id', 'DESC')->first();
+                    $lotteryNumber = $lotterySlotUser->lottery_number;
+                    array_pop($lotteryNumber);
+                    array_push($lotteryNumber, 0);
+                    return $lotteryNumber;
+                }
+
+                // Generate fourDigit winner
+                if ($config['winnerType'] === 'fourDigit') {
+                    $lotterySlotUser = LotterySlotUser::orderBy('lottery_slot_id', 'DESC')->first();
+                    $lotteryNumber = $lotterySlotUser->lottery_number;
+                    array_pop($lotteryNumber);
+                    array_pop($lotteryNumber);
+                    array_push($lotteryNumber, 0);
+                    array_push($lotteryNumber, 0);
+                    return $lotteryNumber;
+                }
+
+            } else {
+                // return the real result
+                return $this->generateRandomLotteryNumber();
+            }
         }
     }
 
