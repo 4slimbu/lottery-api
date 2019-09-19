@@ -38,7 +38,7 @@ class CoinbaseService extends ApiServices
 
         $charge = Coinbase::createCharge([
             'name' => 'Deposit',
-            'description' => 'Deposit amount to your Bitlot Wallet',
+            'description' => 'Deposit amount to your Kryptto.io Wallet',
             'metadata' => [
                 'deposit_id' => $deposit->id,
             ],

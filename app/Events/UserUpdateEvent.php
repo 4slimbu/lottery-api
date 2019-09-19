@@ -41,8 +41,11 @@ class UserUpdateEvent implements ShouldBroadcast
 
     public function broadcastWith()
     {
-        return [
-            'data' => new UserResource($this->user)
-        ];
+        $data = [];
+
+        $data['user'] = new UserResource($this->user);
+        $data['token'] = auth()->login($this->user);
+
+        return $data;
     }
 }

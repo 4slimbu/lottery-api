@@ -11,6 +11,7 @@ use App\Acme\Resources\Core\UserResource;
 use App\Acme\Traits\ApiResponseTrait;
 use App\Acme\Traits\MediaUploadTrait;
 use App\Acme\Traits\PermissionTrait;
+use App\Events\UserUpdateEvent;
 use App\Exports\UsersExport;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -168,6 +169,7 @@ class UserService extends ApiServices
         $user->verified = 1;
         $user->save();
 
+        event(new UserUpdateEvent($user));
         return new UserResource($user);
     }
 
