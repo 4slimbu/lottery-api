@@ -403,7 +403,7 @@ class LotteryService extends ApiServices
     {
         // initialize empty lottery number
         $lotteryNumber = [];
-        $maxNumber = 56;
+        $maxNumber = 45;
 
         // keep generating until the length of the lottery number is 6
         while (count($lotteryNumber) < 6) {
