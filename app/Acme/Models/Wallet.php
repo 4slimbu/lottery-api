@@ -12,6 +12,11 @@ class Wallet extends Model
         'user_id', 'won', 'pending_withdraw', 'deposit'
     ];
 
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
     public function transactions()
     {
         return $this->hasMany(WalletTransaction::class);
@@ -21,10 +26,5 @@ class Wallet extends Model
     {
 
         return $query;
-    }
-
-    public function user()
-    {
-        return $this->belongsTo(User::class);
     }
 }

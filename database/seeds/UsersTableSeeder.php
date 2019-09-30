@@ -56,6 +56,19 @@ class UsersTableSeeder extends Seeder
                 'is_active' => 1,
                 'created_at' => date("Y-m-d H:i:s"),
                 'updated_at' => date("Y-m-d H:i:s"),
+            ],
+            [
+                'first_name' => 'Sudip',
+                'last_name' => 'Limbu',
+                'email' => 'responsivesudip@gmail.com',
+                'username' => 'sudiplimbu',
+                'gender' => 'male',
+                'contact_number' => '92839238',
+                'password' => bcrypt('password'),
+                'verified' => 1,
+                'is_active' => 1,
+                'created_at' => date("Y-m-d H:i:s"),
+                'updated_at' => date("Y-m-d H:i:s"),
             ]
         ));
 

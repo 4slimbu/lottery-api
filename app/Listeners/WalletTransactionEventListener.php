@@ -2,6 +2,7 @@
 
 namespace App\Listeners;
 
+use App\Acme\Emails\WalletTransactionEmail;
 use App\Acme\Models\Setting;
 use App\Events\WalletTransactionEvent;
 use Illuminate\Bus\Queueable;
@@ -31,12 +32,6 @@ class WalletTransactionEventListener implements ShouldQueue
      */
     public function handle(WalletTransactionEvent $event)
     {
-        switch ($event->walletTransaction->type) {
-            case 'win':
-//                Mail::to($event->walletTransaction->user->email)->send(new WalletTransactionEmail($user));
-                break;
-            default:
-                break;
-        }
+        Mail::to($event->user->email)->send(new WalletTransactionEmail($event->walletTransaction, $event->user));
     }
 }

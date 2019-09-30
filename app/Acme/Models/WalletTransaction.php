@@ -12,9 +12,14 @@ class WalletTransaction extends Model
         'transaction_code', 'wallet_id', 'type', 'amount'
     ];
 
+    public function wallet()
+    {
+        return $this->belongsTo(Wallet::class);
+    }
+
     public function scopeFilter($query, $params)
     {
-
         return $query;
     }
+
 }

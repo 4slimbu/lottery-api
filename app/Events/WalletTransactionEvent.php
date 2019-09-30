@@ -14,7 +14,7 @@ class WalletTransactionEvent implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     public $walletTransaction;
-
+    public $user;
     /**
      * Create a new event instance.
      * @param WalletTransaction $walletTransaction
@@ -22,6 +22,7 @@ class WalletTransactionEvent implements ShouldBroadcast
     public function __construct(WalletTransaction $walletTransaction)
     {
         $this->walletTransaction = $walletTransaction;
+        $this->user = $walletTransaction->wallet->user;
     }
 
     /**
