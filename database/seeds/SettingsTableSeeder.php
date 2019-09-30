@@ -74,7 +74,7 @@ class SettingsTableSeeder extends Seeder
             ],
             [
                 'key' => 'lottery_slot_entry_fee',
-                'label' => 'Slot Entry Fee',
+                'label' => 'Slot Entry Fee in Coin',
                 'value' => 1,
                 'comment' => 'Number e.g: 1',
                 'created_at' => date("Y-m-d H:i:s"),

@@ -16,7 +16,7 @@ class CreateCurrenciesTable extends Migration
         Schema::create('currencies', function (Blueprint $table) {
             $table->increments('id');
             $table->string('currency');
-            $table->decimal('value_in_app_coin', 13, 2)->comment('App coin is equal to 1 bit');
+            $table->decimal('value_in_bits', 13, 2)->comment('App coin is equal to 1 bit');
             $table->timestamps();
         });
     }

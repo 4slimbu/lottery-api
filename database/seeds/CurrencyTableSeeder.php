@@ -18,13 +18,13 @@ class CurrencyTableSeeder extends Seeder
         DB::table('currencies')->insert([
             [
                 'currency' => 'BTC',
-                'value_in_app_coin' => 1000000,
+                'value_in_bits' => 1000000,
                 'created_at' => date("Y-m-d H:i:s"),
                 'updated_at' => date("Y-m-d H:i:s"),
             ],
             [
                 'currency' => 'Coin',
-                'value_in_app_coin' => 1000,
+                'value_in_bits' => 1000,
                 'created_at' => date("Y-m-d H:i:s"),
                 'updated_at' => date("Y-m-d H:i:s"),
             ],

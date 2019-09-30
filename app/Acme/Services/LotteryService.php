@@ -2,6 +2,7 @@
 
 namespace App\Acme\Services;
 
+use App\Acme\Models\Currency;
 use App\Events\ParticipantAddedEvent;
 use App\Events\LotterySlotClosedEvent;
 use App\Events\LotterySlotCreatedEvent;
@@ -27,6 +28,11 @@ class LotteryService extends ApiServices
     use ApiResponseTrait, PermissionTrait;
 
     protected $walletService;
+    protected $currency;
+    public function __construct()
+    {
+        $this->currency = new Currency();
+    }
 
     /**
      * Get lottery slots along with participants if with field is provided
@@ -146,7 +152,7 @@ class LotteryService extends ApiServices
             'slot_ref' => str_random(18),
             'start_time' => date("Y-m-d H:i:s", time()),
             'end_time' => date("Y-m-d H:i:s", time() + $runDuration->value * 60),
-            'entry_fee' => $entryFee->value,
+            'entry_fee' => $this->currency->coinToBits($entryFee->value),
             'total_amount' => $previousBalance,
             'status' => 1,
         ]);
@@ -238,7 +244,7 @@ class LotteryService extends ApiServices
         // Skip wallet transaction for bots and user with free_games
         if (!$user->is_bot && !$user->free_games > 0) {
             // Handle Wallet Transaction
-            $transaction = (new WalletService)->handleTransaction($user->wallet, 'order', $entryFee->value);
+            $transaction = (new WalletService)->handleTransaction($user->wallet, 'order', $this->currency->coinToBits($entryFee->value));
 
             if (! $transaction) {
                 return $this->setStatusCode(400)->respondWithError('Transaction Failed', 'transactionFailed');
@@ -278,7 +284,7 @@ class LotteryService extends ApiServices
 
         // Add entry fee to lottery amount only for paid users
         if (!$user->is_bot && !$user->free_games > 0) {
-            $totalAmount = $activeLotterySlot->total_amount + $entryFee->value;
+            $totalAmount = $activeLotterySlot->total_amount + $this->currency->coinToBits($entryFee->value);
         } else {
             $totalAmount = $activeLotterySlot->total_amount;
         }

@@ -22,7 +22,7 @@ class CurrencyResource extends JsonResource
         $currency = [
             'id' => (integer)$this->id,
             'currency' => (string)$this->currency,
-            'value_in_app_coin' => (string)$this->value_in_app_coin,
+            'value_in_bits' => (string)$this->value_in_bits,
             'created_at' => (string)$this->created_at,
             'updated_at' => (string)$this->updated_at,
         ];

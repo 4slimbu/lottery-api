@@ -23,7 +23,7 @@ class CurrencyCreateRequest extends ApiRequest
     {
         return [
             'currency' => 'required|string',
-            'value_in_app_coin' => 'required|string',
+            'value_in_bits' => 'required|string',
         ];
     }
 }

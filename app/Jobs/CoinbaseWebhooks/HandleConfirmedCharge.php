@@ -75,8 +75,8 @@ class HandleConfirmedCharge implements ShouldQueue
 
         // Create top-up wallet transaction
         $walletService = new WalletService();
-        $appCoinModel = Currency::where('currency', 'BTC')->first();
-        $walletService->handleTransaction($wallet, "top-up", $amount * $appCoinModel->value_in_app_coin);
+        $currency = new Currency();
+        $walletService->handleTransaction($wallet, "top-up", $currency->btcToBits($amount));
 
         // Update deposit with the amount and currency
         $deposit->save();
