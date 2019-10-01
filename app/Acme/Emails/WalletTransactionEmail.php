@@ -4,7 +4,7 @@ namespace App\Acme\Emails;
 
 use App\Acme\Models\Currency;
 use App\Acme\Models\WalletTransaction;
-use App\Events\WalletTransactionEvent;
+use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
@@ -23,13 +23,12 @@ class WalletTransactionEmail extends Mailable
      *
      * @param WalletTransaction $walletTransaction
      * @param User $user
-     * @param Currency $currency
      */
-    public function __construct(WalletTransaction $walletTransaction, User $user, Currency $currency)
+    public function __construct(WalletTransaction $walletTransaction, User $user)
     {
         $this->walletTransaction = $walletTransaction;
         $this->user = $user;
-        $this->currency = $currency;
+        $this->currency = new Currency();
     }
     /**
      * Build the message.
@@ -38,13 +37,19 @@ class WalletTransactionEmail extends Mailable
      */
     public function build()
     {
-        return $this->markdown('emails.wallet-transaction')->with([
+        $data = [
             'fullname' => $this->user->first_name . ' ' . $this->user->last_name,
             'transaction_code' => $this->walletTransaction->transaction_code,
             'transaction_type' => $this->walletTransaction->type,
             'amount_in_btc' => $this->currency->bitsToBtc($this->walletTransaction->amount),
+            'service_charge_in_btc' => $this->currency->bitsToBtc($this->walletTransaction->service_charge),
             'amount_in_coin' => $this->currency->bitsToCoin($this->walletTransaction->amount),
-            'created_at' => $this->walletTransaction->created_at
-        ]);
+            'created_at' => (new Carbon($this->walletTransaction->created_at))->toDateTimeString(),
+            'won' => $this->currency->bitsToBtc($this->walletTransaction->wallet->won),
+            'pending_withdraw' => $this->currency->bitsToBtc($this->walletTransaction->wallet->pending_withdraw),
+            'deposit' => $this->currency->bitsToCoin($this->walletTransaction->wallet->deposit)
+        ];
+
+        return $this->markdown('emails.wallet-transaction')->with($data);
     }
 }

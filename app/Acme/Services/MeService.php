@@ -13,8 +13,7 @@ use App\Acme\Resources\WalletTransactionResource;
 use App\Acme\Resources\WithdrawRequestResource;
 use App\Acme\Traits\ApiResponseTrait;
 use App\Acme\Traits\MediaUploadTrait;
-use App\Events\UserUpdateEvent;
-use Carbon\Carbon;
+use App\Events\WithdrawRequestEvent;
 use Illuminate\Support\Facades\Hash;
 
 class MeService extends ApiServices
@@ -151,6 +150,7 @@ class MeService extends ApiServices
         $wallet->pending_withdraw = $input['amount'];
         $wallet->save();
 
+        event(new WithdrawRequestEvent($withdrawRequest));
         return new WithdrawRequestResource($withdrawRequest);
     }
 

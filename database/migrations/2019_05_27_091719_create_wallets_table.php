@@ -16,9 +16,9 @@ class CreateWalletsTable extends Migration {
 		{
 			$table->increments('id');
             $table->integer('user_id')->unsigned();
-            $table->decimal('won', 13, 2)->default(0)->comment('Can be withdrawn (BTC)');
+            $table->decimal('won', 13, 2)->default(0)->comment('Can be withdrawn');
 			$table->decimal('pending_withdraw', 13, 2)->default(0)->comment('Amount that has been requested to withdrawn');
-            $table->decimal('deposit', 13, 2)->default(0)->comment('Deposit amount (App Coin)');
+            $table->decimal('deposit', 13, 2)->default(0);
 			$table->timestamps();
 		});
 	}

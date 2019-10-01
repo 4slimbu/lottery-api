@@ -90,23 +90,23 @@ class WalletService extends ApiServices
 
     }
 
-    public function handleTransaction(Wallet $wallet, $type, $amount)
+    public function handleTransaction(Wallet $wallet, $type, $amount, $service_charge = 0)
     {
         switch ($type) {
             case 'top-up':
                 // top-up
                 // When user top up, amount is added to usable_amount and total_amount is calculated with pending amount
-                return $this->handleTopUpTransaction($wallet, $amount);
+                return $this->handleTopUpTransaction($wallet, $amount, $service_charge);
                 break;
             case 'order':
                 // order
                 // When user buys lottery ticket, amount is deducted from usable_amount and total is recalculated
-                return $this->handleOrderTransaction($wallet, $amount);
+                return $this->handleOrderTransaction($wallet, $amount, $service_charge);
                 break;
             case 'win':
                 // win/refer
                 // When user wins lottery, amount is added to withdrawable as well as usable and total is calculated
-                return $this->handleWinTransaction($wallet, $amount);
+                return $this->handleWinTransaction($wallet, $amount, $service_charge);
 
                 break;
             case 'withdraw':
@@ -120,14 +120,15 @@ class WalletService extends ApiServices
         }
     }
 
-    public function handleTopUpTransaction(Wallet $wallet, $amount)
+    public function handleTopUpTransaction(Wallet $wallet, $amount, $service_charge)
     {
         // Do transaction
         $transaction = WalletTransaction::create([
             'transaction_code' => str_random(18),
             'wallet_id' => $wallet->id,
             'type' => 'top-up',
-            'amount' => $amount
+            'amount' => $amount,
+            'service_charge' => $service_charge
         ]);
 
         if (! $transaction) {
@@ -144,7 +145,7 @@ class WalletService extends ApiServices
         event(new WalletTransactionEvent($transaction));
     }
 
-    public function handleWinTransaction($wallet, $amount)
+    public function handleWinTransaction($wallet, $amount, $service_charge)
     {
 
         // Do transaction
@@ -152,7 +153,8 @@ class WalletService extends ApiServices
             'transaction_code' => str_random(18),
             'wallet_id' => $wallet->id,
             'type' => 'win',
-            'amount' => $amount
+            'amount' => $amount,
+            'service_charge' => $service_charge
         ]);
 
         if (! $transaction) {
@@ -169,7 +171,7 @@ class WalletService extends ApiServices
         event(new WalletTransactionEvent($transaction));
     }
 
-    public function handleOrderTransaction(Wallet $wallet, $amount)
+    public function handleOrderTransaction(Wallet $wallet, $amount, $service_charge)
     {
         // Check wallet and see if it meets the entry value
         if (! $wallet->deposit > $amount) {
@@ -181,7 +183,8 @@ class WalletService extends ApiServices
             'transaction_code' => str_random(18),
             'wallet_id' => $wallet->id,
             'type' => 'order',
-            'amount' => $amount
+            'amount' => $amount,
+            'service_charge' => $service_charge
         ]);
 
         if (! $transaction) {
@@ -258,6 +261,39 @@ class WalletService extends ApiServices
         unset($input['withdraw_request_ids']);
 
         WithdrawRequest::whereIn('id', $withdrawRequestIds)->update($input);
+
+        $withdrawRequests = WithdrawRequest::whereIn('id', $withdrawRequestIds)->get();
+
+        foreach ($withdrawRequests as $withdrawRequest) {
+            // When withdraw request has been completed
+            if ($withdrawRequest->status === 'completed') {
+                // Remove pending withdraw amount as it has been withdrawn
+                $wallet = $withdrawRequest->user->wallet;
+                $wallet->pending_withdraw = 0;
+                $wallet->save();
+
+                // Create transaction
+                $transaction = WalletTransaction::create([
+                    'transaction_code' => str_random(18),
+                    'wallet_id' => $wallet->id,
+                    'type' => 'withdraw',
+                    'amount' => $withdrawRequest->amount,
+                    'service_charge' => 0
+                ]);
+
+                // notify
+                event(new WalletTransactionEvent($transaction));
+            }
+
+            // When withdraw request has been completed
+            if ($withdrawRequest->status === 'failed') {
+                // Remove pending withdraw amount and add it back to won amount
+                $wallet = $withdrawRequest->user->wallet;
+                $wallet->won = $wallet->won + $wallet->pending_withdraw;
+                $wallet->pending_withdraw = 0;
+                $wallet->save();
+            }
+        }
     }
 
     public function destroyWithdrawRequest()

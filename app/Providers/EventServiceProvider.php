@@ -15,7 +15,6 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         'App\Acme\Events\Registration\UserRegisteredEvent' => [
             'App\Acme\Listeners\Registration\SendWelcomeEmailListener',
-            'App\Acme\Listeners\Registration\SendVerificationEmailListener',
         ],
         'App\Acme\Events\Registration\UserForgotPasswordEvent' => [
             'App\Acme\Listeners\Registration\SendResetPasswordEmailListener',
@@ -35,6 +34,10 @@ class EventServiceProvider extends ServiceProvider
         // Wallet Events
         'App\Events\WalletTransactionEvent' => [
             'App\Listeners\WalletTransactionEventListener'
+        ],
+        // Withdraw
+        'App\Events\WithdrawRequestEvent' => [
+            'App\Listeners\WithdrawRequestEventListener'
         ],
     ];
 

@@ -565,7 +565,7 @@ class LotteryService extends ApiServices
                         ])->save();
 
                         $wallet = Wallet::where('user_id', $winner->user_id)->first();
-                        (new WalletService)->handleTransaction($wallet, 'win', $wonAmount);
+                        (new WalletService)->handleTransaction($wallet, 'win', $wonAmount, $serviceCharge);
                     }
                 }
 

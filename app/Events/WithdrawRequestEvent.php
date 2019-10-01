@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use App\Acme\Models\WalletTransaction;
+use App\Acme\Models\WithdrawRequest;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -10,20 +11,20 @@ use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
 
-class WalletTransactionEvent implements ShouldBroadcast
+class WithdrawRequestEvent implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
-    public $walletTransaction;
+    public $withdraw_request;
     public $user;
     /**
      * Create a new event instance.
-     * @param WalletTransaction $walletTransaction
+     * @param WithdrawRequest $withdraw_request
      */
-    public function __construct(WalletTransaction $walletTransaction)
+    public function __construct(WithdrawRequest $withdraw_request)
     {
-        $this->walletTransaction = $walletTransaction;
-        $this->user = $walletTransaction->wallet->user;
+        $this->withdraw_request = $withdraw_request;
+        $this->user = $withdraw_request->user;
     }
 
     /**
@@ -33,13 +34,13 @@ class WalletTransactionEvent implements ShouldBroadcast
      */
     public function broadcastOn()
     {
-//        return new PrivateChannel('App.User.' . $this->user->id);
+//        return new PrivateChannel('App.User.' . $this->withdraw_request->user_id);
     }
 
     public function broadcastWith()
     {
         return [
-            'data' => 'Wallet Transaction Event'
+            'data' => 'Withdraw Event'
         ];
     }
 }
