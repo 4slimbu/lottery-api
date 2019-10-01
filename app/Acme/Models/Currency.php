@@ -28,7 +28,7 @@ class Currency extends Model
     {
         $coinModel = $this->where('currency', 'Coin')->first();
 
-        return round($bits / $coinModel->value_in_bits);
+        return $bits / $coinModel->value_in_bits;
     }
 
     public function btcToBits($btc)
@@ -42,6 +42,6 @@ class Currency extends Model
     {
         $btcModel = $this->where('currency', 'BTC')->first();
 
-        return round($bits / $btcModel->value_in_bits, 6);
+        return number_format($bits / $btcModel->value_in_bits, 6);
     }
 }
