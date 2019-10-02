@@ -28,20 +28,22 @@ class Currency extends Model
     {
         $coinModel = $this->where('currency', 'Coin')->first();
 
-        return $bits / $coinModel->value_in_bits;
+        $coin = $bits / $coinModel->value_in_bits;
+        return round( $coin, 2 ) !== 0 ? round( $coin, 2 ) : 0;
     }
 
     public function btcToBits($btc)
     {
         $btcModel = $this->where('currency', 'BTC')->first();
 
-        return ;
+        return $btc *  $btcModel->value_in_bits;
     }
 
     public function bitsToBtc($bits)
     {
         $btcModel = $this->where('currency', 'BTC')->first();
 
-        return number_format($bits / $btcModel->value_in_bits, 6);
+        $btc = $bits / $btcModel->value_in_bits;
+        return round( $btc, 6 ) !== 0 ? round( $btc, 6 ) : 0;
     }
 }
