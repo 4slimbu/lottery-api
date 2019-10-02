@@ -25,6 +25,7 @@ class PageResource extends JsonResource
             'content' => (string)$this->content,
             'created_at' => (string)$this->created_at,
             'updated_at' => (string)$this->updated_at,
+            'seo' => new SeoResource($this->whenLoaded('seo')),
         ];
 
         return $page;

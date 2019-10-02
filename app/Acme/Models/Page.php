@@ -10,6 +10,10 @@ class Page extends Model
 
     protected $fillable = ['title', 'slug', 'content'];
 
+    public function seo()
+    {
+        return $this->hasOne(Seo::class);
+    }
 
     public function scopeFilter($query, $params)
     {

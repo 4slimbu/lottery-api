@@ -20,6 +20,7 @@ class PageService extends ApiServices
         $query = Page::filter($input);
 
         $pages = $query->paginate($input['limit'] ?? 15);
+        $pages->load('seo');
         return PageResource::collection($pages);
     }
 
@@ -44,10 +45,6 @@ class PageService extends ApiServices
 
     public function showPage($input)
     {
-//        if (!$this->currentUserCan('getPages')) {
-//            return $this->respondWithNotAllowed();
-//        }
-
         if (isset($input['page_slug'])) {
             $page = Page::where('slug', $input['page_slug'])->firstOrFail();
         }
@@ -55,6 +52,8 @@ class PageService extends ApiServices
         if (isset($input['page_id'])) {
             $page = Page::where('id', $input['page_id'])->firstOrFail();
         }
+
+        $page->load('seo');
 
         return new PageResource($page);
     }

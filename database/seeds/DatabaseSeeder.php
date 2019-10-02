@@ -50,5 +50,8 @@ class DatabaseSeeder extends Seeder
         //===============Page ====================
         $this->call(PageTableSeeder::class);
 
+        //===============Page ====================
+        $this->call(SeoTableSeeder::class);
+
     }
 }
