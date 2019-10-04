@@ -22,23 +22,16 @@ class SeoController extends ApiController
         return $this->seoService->getSeo($input);
     }
 
-    public function create(SeoCreateRequest $request)
+    public function save(SeoUpdateRequest $request)
     {
         $input = $request->getInput();
-        return $this->seoService->createSeo($input);
+        return $this->seoService->saveSeo($input);
     }
 
     public function show($seoId)
     {
         $input['id'] = $seoId;
         return $this->seoService->showSeo($input);
-    }
-
-    public function update(SeoUpdateRequest $request, $seoId)
-    {
-        $input = $request->getInput();
-        $input['id'] = $seoId;
-        return $this->seoService->updateSeo($input);
     }
 
     public function destroy($seoId)

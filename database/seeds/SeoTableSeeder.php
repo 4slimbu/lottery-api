@@ -17,7 +17,7 @@ class SeoTableSeeder extends Seeder
 
         DB::table('seo')->insert([
             [
-                'page_id' => 0,
+                'page_id' => 1,
                 'meta_title' => 'Krypto',
                 'meta_description' => 'Krypto is a lottery game hosting service',
                 'og_title' => 'Krypto',

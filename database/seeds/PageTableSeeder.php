@@ -17,6 +17,13 @@ class PageTableSeeder extends Seeder
 
         DB::table('pages')->insert([
             [
+                'title' => 'Home',
+                'slug' => 'home',
+                'content' => '',
+                'created_at' => date("Y-m-d H:i:s"),
+                'updated_at' => date("Y-m-d H:i:s"),
+            ],
+            [
                 'title' => 'About',
                 'slug' => 'about',
                 'content' => 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nunc nisi sapien, pulvinar in 

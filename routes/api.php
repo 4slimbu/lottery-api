@@ -99,9 +99,8 @@ Route::prefix('v1')->namespace('\App\Acme\Controllers')->group(function() {
     Route::delete('pages/{pageId}', 'PageController@destroy')->where('pageId', '[0-9]+');
     // Pages
     Route::get('seo', 'SeoController@index');
-    Route::post('seo', 'SeoController@create');
+    Route::post('seo', 'SeoController@save');
     Route::get('seo/{seoId}', 'SeoController@show')->where('seoId', '[0-9]+');
-    Route::put('seo/{seoId}', 'SeoController@update')->where('seoId', '[0-9]+');
     Route::delete('seo/{seoId}', 'SeoController@destroy')->where('seoId', '[0-9]+');
 
     // Contact Us

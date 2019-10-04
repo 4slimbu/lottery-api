@@ -40,4 +40,8 @@ return [
         'client_id' => env('CAMPAIGNMONITOR_CLIENT_ID'),
     ],
 
+    'mandrill' => [
+        'secret' => env('MANDRILL_SECRET'),
+    ],
+
 ];

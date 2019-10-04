@@ -19,25 +19,6 @@ class SeoService extends ApiServices
         return SeoResource::collection($pages);
     }
 
-    public function createSeo($input)
-    {
-        if (! $this->currentUserCan('createSeo')) {
-            return $this->respondWithNotAllowed();
-        }
-
-        $existingSeo = Seo::where('page_id', $input['page_id'])->first();
-        if (!empty($existingSeo)) {
-            return $this->respondWithError('Seo already exists for the page.', 'SeoExistsException')->setStatusCode(400);
-        }
-
-        $seo = new Seo();
-        $seo->fill($input);
-
-        $seo->save();
-
-        return new SeoResource($seo);
-    }
-
     public function showSeo($input)
     {
         if (!isset($input['id'])) {
@@ -49,13 +30,17 @@ class SeoService extends ApiServices
         return new SeoResource($seo);
     }
 
-    public function updateSeo($input)
+    public function saveSeo($input)
     {
         if (!$this->currentUserCan('updateSeo')) {
+
             return $this->respondWithNotAllowed();
         }
 
-        $seo = Seo::findOrFail($input['id']);
+        $seo = Seo::where('page_id', $input['page_id'])->first();
+        if (empty($seo)) {
+            $seo = new Seo();
+        }
         $seo->fill($input);
         $seo->save();
 

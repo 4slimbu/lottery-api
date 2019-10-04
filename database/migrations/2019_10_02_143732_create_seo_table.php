@@ -15,7 +15,7 @@ class CreateSeoTable extends Migration
     {
         Schema::create('seo', function (Blueprint $table) {
             $table->increments('id');
-            $table->integer('page_id');
+            $table->integer('page_id')->unique();
             $table->string('meta_title')->nullable();
             $table->string('meta_description')->nullable();
             $table->string('og_title')->nullable();
