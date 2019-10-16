@@ -24,7 +24,7 @@ class CurrencyTableSeeder extends Seeder
             ],
             [
                 'currency' => 'Coin',
-                'value_in_bits' => 100,
+                'value_in_bits' => 200,
                 'created_at' => date("Y-m-d H:i:s"),
                 'updated_at' => date("Y-m-d H:i:s"),
             ],
