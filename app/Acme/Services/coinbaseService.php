@@ -3,6 +3,7 @@
 namespace App\Acme\Services;
 
 use App\Acme\Events\Registration\RoleForgotPasswordEvent;
+use App\Acme\Models\Currency;
 use App\Events\WalletTransactionEvent;
 use App\Acme\Exceptions\ServerErrorException;
 use App\Acme\Models\LotterySlot;
@@ -26,23 +27,29 @@ class CoinbaseService extends ApiServices
     use ApiResponseTrait, PermissionTrait;
 
     public $depositService;
+    public $currency;
 
-    public function __construct(DepositService $depositService)
+    public function __construct(DepositService $depositService, Currency $currency)
     {
         $this->depositService = $depositService;
+        $this->currency = $currency;
     }
 
-    public function createCharge()
+    public function createCharge($coins)
     {
         $deposit = $this->depositService->create();
 
         $charge = Coinbase::createCharge([
             'name' => 'Deposit',
             'description' => 'Deposit amount to your Kryptto.io Wallet',
+            'local_price' => [
+                'amount' => $this->currency->coinToBtc($coins),
+                'currency' => 'BTC',
+            ],
             'metadata' => [
                 'deposit_id' => $deposit->id,
             ],
-            'pricing_type' => 'no_price',
+            'pricing_type' => 'fixed_price',
         ]);
 
         if ($charge) {

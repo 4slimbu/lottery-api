@@ -46,4 +46,9 @@ class Currency extends Model
         $btc = $bits / $btcModel->value_in_bits;
         return round( $btc, 6 ) !== 0 ? round( $btc, 6 ) : 0;
     }
+
+    public function coinToBtc($coin)
+    {
+        return $this->bitsToBtc($this->coinToBits($coin));
+    }
 }

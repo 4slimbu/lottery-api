@@ -13,7 +13,7 @@ class CurrencyService extends ApiServices
 
     public function getCurrencies($input)
     {
-        $currencies = Currency::get();
+        $currencies = Currency::paginate();
         return CurrencyResource::collection($currencies);
     }
 
