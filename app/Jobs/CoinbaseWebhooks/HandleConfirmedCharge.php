@@ -60,14 +60,16 @@ class HandleConfirmedCharge implements ShouldQueue
             $localAmount =  $payment["value"]["local"]["amount"];
             $localCurrency =  $payment["value"]["local"]["currency"];
 
+            $amount = $localAmount;
+            // Not required as we are using BTC as local currency.
             // We have setup conversion for USD only. If not, don't proceed further
-            if ($localCurrency === 'USD') {
-                $client = new Client();
-                $res = $client->get('https://blockchain.info/tobtc?currency=USD&value=' . $localAmount);
-                $amount = $res->getBody()->getContents();
-            } else {
-                throw new \Exception('Failed Currency conversion', 500);
-            }
+//            if ($localCurrency === 'USD') {
+//                $client = new Client();
+//                $res = $client->get('https://blockchain.info/tobtc?currency=USD&value=' . $localAmount);
+//                $amount = $res->getBody()->getContents();
+//            } else {
+//                throw new \Exception('Failed Currency conversion', 500);
+//            }
         }
 
         // Get related wallet
@@ -76,9 +78,12 @@ class HandleConfirmedCharge implements ShouldQueue
         // Create top-up wallet transaction
         $walletService = new WalletService();
         $currency = new Currency();
-        $walletService->handleTransaction($wallet, "top-up", $currency->btcToBits($amount));
+        $walletTransactionId = $walletService->handleTransaction($wallet, "top-up", $currency->btcToBits($amount));
 
         // Update deposit with the amount and currency
+        if ($walletTransactionId > 0) {
+            $deposit->wallet_transaction_id = $walletTransactionId;
+        }
         $deposit->save();
 
         // Fire user updated event

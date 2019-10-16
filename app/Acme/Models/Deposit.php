@@ -9,7 +9,7 @@ class Deposit extends Model
     protected $table = 'deposits';
 
     protected $fillable = [
-        'user_id', 'wallet_id', 'amount', 'charge_code', 'status'
+        'user_id', 'wallet_id', 'wallet_transaction_id', 'amount', 'charge_code', 'status'
     ];
 
 

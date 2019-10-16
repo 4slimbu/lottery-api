@@ -17,6 +17,7 @@ class CreateDepositsTable extends Migration
             $table->increments('id');
             $table->integer('user_id');
             $table->integer('wallet_id');
+            $table->integer('wallet_transaction_id')->nullable();
             $table->string('amount')->nullable();
             $table->string('currency')->nullable();
             $table->string('charge_code')->nullable();

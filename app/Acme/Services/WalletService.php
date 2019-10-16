@@ -143,6 +143,9 @@ class WalletService extends ApiServices
 
         // Fire wallet transaction event
         event(new WalletTransactionEvent($transaction));
+
+        // return wallet transaction id
+        return $transaction->id;
     }
 
     public function handleWinTransaction($wallet, $amount, $service_charge)
@@ -169,6 +172,9 @@ class WalletService extends ApiServices
 
         // Fire wallet transaction event
         event(new WalletTransactionEvent($transaction));
+
+        // return wallet transaction id
+        return $transaction->id;
     }
 
     public function handleOrderTransaction(Wallet $wallet, $amount, $service_charge)
@@ -199,7 +205,9 @@ class WalletService extends ApiServices
 
         // Fire wallet transaction event
         event(new WalletTransactionEvent($transaction));
-        return true;
+
+        // return wallet transaction id
+        return $transaction->id;
     }
 
     public function handleReferTransaction()
