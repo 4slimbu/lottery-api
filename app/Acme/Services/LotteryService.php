@@ -198,7 +198,7 @@ class LotteryService extends ApiServices
         if ($winners) {
             // Get all winners list
             $winners = LotterySlotUser::where('lottery_winner_type_id', '!=', null)
-                ->orderBy('lottery_slot_id', 'DESC')->paginate(8);
+                ->orderBy('lottery_slot_id', 'DESC')->paginate(7);
             $data['winners'] = LotterySlotUserResource::collection($winners);
         }
 

@@ -62,7 +62,7 @@ class AuthService extends ApiServices
         $user->wallet()->create([]);
 
         event(new UserRegisteredEvent($user));
-        return $this->login($loginInput);
+        return $this->playerLogin($loginInput);
     }
 
     public function registerAsGuest($input)
