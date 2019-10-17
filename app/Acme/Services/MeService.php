@@ -119,6 +119,7 @@ class MeService extends ApiServices
         $user = auth()->user();
 
         $walletTransactions = WalletTransaction::where('wallet_id', $user->wallet->id)->paginate($inputs['limit'] ?? 15);
+        $walletTransactions->load('deposit');
 
         return WalletTransactionResource::collection($walletTransactions);
     }

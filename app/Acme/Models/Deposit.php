@@ -12,6 +12,10 @@ class Deposit extends Model
         'user_id', 'wallet_id', 'wallet_transaction_id', 'amount', 'charge_code', 'status'
     ];
 
+    public function walletTransaction()
+    {
+        return $this->belongsTo(WalletTransaction::class);
+    }
 
     public function scopeFilter($query, $params)
     {

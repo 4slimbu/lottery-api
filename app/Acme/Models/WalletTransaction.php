@@ -17,6 +17,11 @@ class WalletTransaction extends Model
         return $this->belongsTo(Wallet::class);
     }
 
+    public function deposit()
+    {
+        return $this->hasOne(Deposit::class);
+    }
+
     public function scopeFilter($query, $params)
     {
         return $query;
