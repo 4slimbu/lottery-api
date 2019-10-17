@@ -18,12 +18,9 @@ class HandleFailedCharge implements ShouldQueue
     /** @var \Shakurov\Coinbase\Models\CoinbaseWebhookCall */
     public $webhookCall;
 
-    public $depositService;
-
-    public function __construct(CoinbaseWebhookCall $webhookCall, DepositService $depositService)
+    public function __construct(CoinbaseWebhookCall $webhookCall)
     {
         $this->webhookCall = $webhookCall;
-        $this->depositService = $depositService;
     }
 
     public function handle()
