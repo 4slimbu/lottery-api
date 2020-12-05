@@ -1,31 +1,31 @@
 {
-	"authHost": "https://api.kryptto.io",
-	"authEndpoint": "/broadcasting/auth",
-	"clients": [],
-	"database": "redis",
-	"databaseConfig": {
-		"redis": {},
-		"sqlite": {
-			"databasePath": "/database/laravel-echo-server.sqlite"
-		}
-	},
-	"devMode": false,
-	"host": null,
-	"port": "6001",
-	"protocol": "http",
-	"socketio": {},
-	"sslCertPath": "",
-	"sslKeyPath": "",
-	"sslCertChainPath": "",
-	"sslPassphrase": "",
-	"subscribers": {
-		"http": true,
-		"redis": true
-	},
-	"apiOriginAllow": {
-		"allowCors": false,
-		"allowOrigin": "",
-		"allowMethods": "",
-		"allowHeaders": ""
-	}
+  "apiOriginAllow": {},
+  "authEndpoint": "/broadcasting/auth",
+  "authHost": "http://localhost",
+  "clients": [],
+  "database": "redis",
+  "databaseConfig": {
+    "redis": {
+      "host": "redis",
+      "port": "6379",
+      "keyPrefix": "",
+      "options": {
+        "db": "0"
+      }
+    },
+    "sqlite": {
+      "databasePath": "/database/laravel-echo-server.sqlite"
+    },
+    "publishPresence": true
+  },
+  "devMode": false,
+  "host": null,
+  "port": 6001,
+  "protocol": "http",
+  "sslCertPath": "",
+  "sslKeyPath": "",
+  "sslCertChainPath": "",
+  "sslPassphrase": "",
+  "socketio": {},
+  "subscribers": {"http": true, "redis": true}
 }
