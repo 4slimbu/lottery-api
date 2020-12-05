@@ -12,7 +12,6 @@
         "ext-soap": "^7.2",
         "alymosul/laravel-exponent-push-notifications": "^1.7",
         "aws/aws-sdk-php": "^3.64",
-        "barryvdh/laravel-cors": "^0.11.0",
         "campaignmonitor/createsend-php": "^6.0",
         "fideloper/proxy": "^4.0",
         "guzzlehttp/guzzle": "^6.3",
@@ -23,6 +22,7 @@
         "predis/predis": "^1.1",
         "ramsey/uuid": "^3.8",
         "shakurov/coinbase": "^0.7.6",
+        "spatie/laravel-cors": "^1.6",
         "spatie/laravel-medialibrary": "^7.0.0",
         "tymon/jwt-auth": "^1.0"
     },

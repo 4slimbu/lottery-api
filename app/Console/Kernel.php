@@ -29,6 +29,13 @@ class Kernel extends ConsoleKernel
     {
         $seconds = 1;
 
+        $schedule->command('queue:restart')
+            ->everyFiveMinutes();
+
+        $schedule->command('queue:work --daemon')
+            ->everyMinute()
+            ->withoutOverlapping();
+
         $schedule->call(function () use ($schedule, $seconds) {
 
             $dt = Carbon::now();
