@@ -36,7 +36,7 @@ docker-compose exec app php artisan migrate
 docker-compose exec app php artisan db:seed
 ```
 - Api will be available at:  
-http://localhost:8000/api/v1
+http://localhost:8000
 
 # API Docs
 Please visit [API Documentation](https://documenter.getpostman.com/view/3230491/TVsuBSRp)
