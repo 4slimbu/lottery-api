@@ -11,7 +11,7 @@
 |
 */
 
-//Route::view('/{path?}', 'app');
+Route::view('/{path?}', 'welcome');
 
 //Route::get('test-broadcast', function(){
 //    broadcast(new \App\Events\UserUpdateEvent(auth()->user()));

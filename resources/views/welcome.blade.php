@@ -65,36 +65,15 @@
         </style>
     </head>
     <body>
-    @can('create_account')
-        <a href="">Create Account</a>
-    @endcan
-
-    @can('create_user')
-        <a href="">Create User</a>
-    @endcan
         <div class="flex-center position-ref full-height">
-            @if (Route::has('login'))
-                <div class="top-right links">
-                    @auth
-                        <a href="{{ url('/home') }}">Home</a>
-                    @else
-                        <a href="{{ route('login') }}">Login</a>
-                        <a href="{{ route('register') }}">Register</a>
-                    @endauth
-                </div>
-            @endif
-
             <div class="content">
                 <div class="title m-b-md">
-                    Laravel
+                    Lotterycamp API
                 </div>
 
                 <div class="links">
-                    <a href="https://laravel.com/docs">Documentation</a>
-                    <a href="https://laracasts.com">Laracasts</a>
-                    <a href="https://laravel-news.com">News</a>
-                    <a href="https://forge.laravel.com">Forge</a>
-                    <a href="https://github.com/laravel/laravel">GitHub</a>
+                    <a href="https://documenter.getpostman.com/view/3230491/TVsuBSRp">Documentation</a>
+                    <a href="https://github.com/limvus/lotterycamp">GitHub</a>
                 </div>
             </div>
         </div>
