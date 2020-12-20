@@ -1,62 +1,56 @@
 # Lottery API
-This application provides api for the lottery app.
+This app acts as api for the [lotterycamp](https://github.com/limvus/lotterycamp.git) project.
 
-### API CODES
+**Technology Used**
+- Laravel (Main API)
+- Coinbase (Crypto Transaction API)
+- Redis (Queue Driver)
+- Laravel Echo Server (Realtime Web Socket Server)
+- Mysql (Main Database)
 
-### Events
-- LotterySlotCreatedEvent
-- WalletTransactionEvent
-- LotterySlotResultGeneratedEvent
-- LotterySlotClosedEvent
-- ParticipantAddedEvent
+# System Requirements
+- docker
 
-### Real Time config
-This app uses following technologies to achieve real time 
-functionality:
-- laravel-echo-server (on api as broadcast driver)
-- predis/predis (on api as queue/database driver)
-- socket.io-client (on app as broadcaster technology)
-- laravel-echo (on app as broadcast listener)
+## Installation
+- This app is part of [lotterycamp](https://github.com/limvus/lotterycamp.git) so make sure this repo is 
+cloned while cloning lotterycamp then follow the following steps:
+```
+# create .env file from .env.example. 
+# you can update various config like db credentials, smtp credentials etc. here.
+# default is fine for test purpose 
+cp .env.example .env
 
-Any event should implements ShouldBroadcast to successfully
-broadcast events
+# build all the containers and runs it
+docker-compose up -d
 
-To make broadcasting work make sure you have run these commands:
-laravel-echo-server start
-php artisan queue:listen --tries=1
+# install dependencies
+docker-compose exec app composer install
 
-For windows: 
-Setup task scheduler like cron and run "php artisan schedule:run" using it
+# generate unique key
+docker-compose exec app php artisan key:generate
 
-Reference:
-https://laravel.com/docs/5.8/broadcasting
-https://blog.usejournal.com/laravel-echo-server-how-to-24d5778ece8b
+# migrate all the tables
+docker-compose exec app php artisan migrate
 
-### Webhook
-For local development, I used ngrok to tunnel local web server
-to online.
-- download ngrok.exe for windows then execute:
-    ngrok http 8000 (for laravel api when server is created using: php artisan serve)
-    
-Docs:
-https://dashboard.ngrok.com/get-started
+# seed default data
+docker-compose exec app php artisan db:seed
+```
+- Api will be available at:  
+http://localhost:8000/api/v1
 
-Following url can be used to view response of webhook:
-http://localhost:4040
+# API Docs
+Please visit [API Documentation](https://documenter.getpostman.com/view/3230491/TVsuBSRp)
 
-### Payment integration
-- When user click on deposit
-	- show form to let them fill how much they want to deposit
-	- Create an pending order
-	- Create charge with the deposit amount and order id as meta data
-	- Show user the charge on popup: https://commerce.coinbase.com/charges/charge-code
-	- When user pays and the charge is confirmed, redirect user to home page
-	- In the backend, it will receive charge:completed event which is processed and order is updated with completed status. Also, amount will be added to wallet, then amount added event will be broadcasted to that particular user.
-	- In the frontend, the particular user will see his/her updated wallet.
+## Contribution
+If you want to contribute, just fork the repository and play around, create 
+issues and submit the pull request. Help is always welcomed.
 
-Payment integration is handled by coinbase-commerce.
-For laravel, following package is used to ingegrate coinbase-commerce:
-https://github.com/shakurov/laravel-coinbase
+## Security
+If you discover any security related issues, please email hello@sudiplimbu.com 
+instead of using the issue tracker.
 
-Docs for coinbase-commerce:
-https://commerce.coinbase.com/docs/api
+## License
+The scripts and documentation in this project are released under the MIT License
+
+## Author
+Sudip Limbu
