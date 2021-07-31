@@ -1,148 +1,136 @@
 version: "3.7"
 services:
-    app:
-        build:
-            args:
-                user: sudip
-                uid: 1000
-            context: ./
-            dockerfile: Dockerfile
-        image: limvus/lottery
-        container_name: lottery-app
-        restart: unless-stopped
-        working_dir: /var/www/
-        volumes:
-            - ./:/var/www
-        networks:
-            - lottery
-        labels:
-            ofelia.enabled: "true"
-            ofelia.job-exec.datecron.schedule: "@every 60s"
-            ofelia.job-exec.datecron.command: "php artisan schedule:run"
-        #command: >
-            # bash -c "php artisan queue:work"
-            
-    supervisor:
-        build:
-            args:
-                user: sudip
-                uid: 1000
-            context: ./
-            dockerfile: Supervisord.Dockerfile
-        image: limvus/lottery-supervisor
-        container_name: lottery-supervisor
-        restart: unless-stopped
-        networks:
-            - lottery
-    
-    db:
-        image: mysql:5.7
-        container_name: lottery-db
-        restart: unless-stopped
-        environment:
-            MYSQL_DATABASE: ${DB_DATABASE}
-            MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-            MYSQL_USER: ${DB_USERNAME}
-            MYSQL_PASSWORD: ${DB_PASSWORD}
-            SERVICE_TAGS: dev
-            SERVICE_NAME: mysql
-        volumes:
-            - lottery_db:/var/lib/mysql
-            - ./docker-compose/mysql:/docker-entrypoint-initdb.d
-            - ./docker-compose/php/local.ini:/usr/local/etc/php/conf.d/local.ini
-        networks:
-            - lottery
+  app:
+    build:
+      args:
+        user: sudip
+        uid: 1000
+      context: ./
+      dockerfile: Dockerfile
+    image: limvus/lottery
+    container_name: lottery-app
+    restart: unless-stopped
+    working_dir: /var/www/
+    volumes:
+      - ./:/var/www
+    labels:
+      ofelia.enabled: "true"
+      ofelia.job-exec.datecron.schedule: "@every 60s"
+      ofelia.job-exec.datecron.command: "php artisan schedule:run"
+    #command: >
+    # bash -c "php artisan queue:work"
 
-    phpmyadmin:
-        image: phpmyadmin/phpmyadmin
-        restart: always
-        depends_on: 
-            - db
-        environment:
-            PMA_HOST: db
-            PMA_USER: root
-            PMA_PASSWORD: ${DB_ROOT_PASSWORD}
-        ports:
-            - "8888:80"
-        networks: 
-            - lottery
+  supervisor:
+    build:
+      args:
+        user: sudip
+        uid: 1000
+      context: ./
+      dockerfile: Supervisord.Dockerfile
+    image: limvus/lottery-supervisor
+    container_name: lottery-supervisor
+    restart: unless-stopped
 
-    nginx:
-        image: nginx:1.17-alpine
-        container_name: lottery-nginx
-        restart: unless-stopped
-        ports:
-            - 8000:80
-        volumes:
-            - ./:/var/www
-            - ./docker-compose/nginx:/etc/nginx/conf.d
-        networks:
-            - lottery
+  db:
+    image: mysql:5.7
+    container_name: lottery-db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
+    volumes:
+      - lottery_db:/var/lib/mysql
+      - ./docker-compose/mysql:/docker-entrypoint-initdb.d
+      - ./docker-compose/php/local.ini:/usr/local/etc/php/conf.d/local.ini
 
-    redis:
-        image: redis:alpine
-        command:
-            - redis-server
-            - --appendonly yes
-        networks:
-            - lottery
-        restart: unless-stopped
-        volumes:
-            - redis_db:/data
-        healthcheck:
-            test: redis-cli -h redis -p 6379 ping
-            start_period: 1s
-            interval: 1s
-            timeout: 3s
-            retries: 10
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    restart: always
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: ${DB_ROOT_PASSWORD}
+    ports:
+      - "8888:80"
 
-    laravel-echo-server:
-        image: oanhnn/laravel-echo-server:latest
-        depends_on:
-            - redis
-        networks:
-            - lottery
-        restart: unless-stopped
-        ports:
-            - 6001:6001
-        volumes:
-            - ./:/app
-        healthcheck:
-            test: /usr/local/bin/health-check
-            start_period: 1s
-            interval: 1s
-            timeout: 3s
-            retries: 10
+  nginx:
+    image: nginx:1.17-alpine
+    container_name: lottery-nginx
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www
+      - ./docker-compose/nginx:/etc/nginx/conf.d
+    environment:
+      - VIRTUAL_HOST=api.lotterycamp.local
+      - LETSENCRYPT_HOST=api.lotterycamp.local
 
-    ofelia: 
-        image: mcuadros/ofelia:latest
-        depends_on:
-            - nginx
-        command: daemon --docker
-        volumes:
-            - /var/run/docker.sock:/var/run/docker.sock:ro
-    
-    # supervisor:
-    #     build:
-    #         context: ./
-    #         dockerfile: Supervisord.Dockerfile
-    #     image: limvus/supervisord
-    #     container_name: lottery-supervisor
-    #     restart: unless-stopped
-    #     working_dir: /var/www/
-    #     volumes:
-    #         - ./:/var/www
-    #     networks:
-    #         - lottery
-    #     labels:
-    #         ofelia.enabled: "true"
-    #         ofelia.job-exec.datecron.schedule: "@every 60s"
-    #         ofelia.job-exec.datecron.command: "php artisan schedule:run"
+  redis:
+    image: redis:alpine
+    command:
+      - redis-server
+      - --appendonly yes
+    restart: unless-stopped
+    volumes:
+      - redis_db:/data
+    healthcheck:
+      test: redis-cli -h redis -p 6379 ping
+      start_period: 1s
+      interval: 1s
+      timeout: 3s
+      retries: 10
+
+  laravel-echo-server:
+    image: oanhnn/laravel-echo-server:latest
+    depends_on:
+      - redis
+    restart: unless-stopped
+    ports:
+      - 6001:6001
+    volumes:
+      - ./:/app
+    healthcheck:
+      test: /usr/local/bin/health-check
+      start_period: 1s
+      interval: 1s
+      timeout: 3s
+      retries: 10
+
+  ofelia:
+    image: mcuadros/ofelia:latest
+    depends_on:
+      - nginx
+    command: daemon --docker
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+
+  # supervisor:
+  #     build:
+  #         context: ./
+  #         dockerfile: Supervisord.Dockerfile
+  #     image: limvus/supervisord
+  #     container_name: lottery-supervisor
+  #     restart: unless-stopped
+  #     working_dir: /var/www/
+  #     volumes:
+  #         - ./:/var/www
+  #     networks:
+  #         - lottery
+  #     labels:
+  #         ofelia.enabled: "true"
+  #         ofelia.job-exec.datecron.schedule: "@every 60s"
+  #         ofelia.job-exec.datecron.command: "php artisan schedule:run"
 
 networks:
-    lottery:
-        driver: bridge        
+  default:
+    external:
+      name: projects_default
 
 volumes:
-    lottery_db:
-    redis_db:
+  lottery_db:
+  redis_db:
