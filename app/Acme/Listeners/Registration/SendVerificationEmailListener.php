@@ -8,7 +8,7 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Mail;
 
-class SendVerificationEmailListener
+class SendVerificationEmailListener implements ShouldQueue
 {
     /**
      * Create the event listener.
