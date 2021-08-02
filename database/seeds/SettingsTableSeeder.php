@@ -19,7 +19,7 @@ class SettingsTableSeeder extends Seeder
             [
                 'key' => 'app_name',
                 'label' => 'App Name',
-                'value' => 'Kryptto.io',
+                'value' => 'LotteryCamp',
                 'comment' => 'Text',
                 'created_at' => date("Y-m-d H:i:s"),
                 'updated_at' => date("Y-m-d H:i:s"),
@@ -51,7 +51,7 @@ class SettingsTableSeeder extends Seeder
             [
                 'key' => 'app_facebook_url',
                 'label' => 'Facebook Url',
-                'value' => 'https://facebook/kryptto',
+                'value' => 'https://facebook/lotterycamp',
                 'comment' => 'Url e.g: https://example.com',
                 'created_at' => date("Y-m-d H:i:s"),
                 'updated_at' => date("Y-m-d H:i:s"),
@@ -59,7 +59,7 @@ class SettingsTableSeeder extends Seeder
             [
                 'key' => 'app_twitter_url',
                 'label' => 'Twitter Url',
-                'value' => 'https://twitter/kryptto',
+                'value' => 'https://twitter/lotterycamp',
                 'comment' => 'Url e.g: https://example.com',
                 'created_at' => date("Y-m-d H:i:s"),
                 'updated_at' => date("Y-m-d H:i:s"),

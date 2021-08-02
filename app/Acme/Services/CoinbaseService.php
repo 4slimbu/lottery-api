@@ -41,7 +41,7 @@ class CoinbaseService extends ApiServices
 
         $charge = Coinbase::createCharge([
             'name' => 'Deposit',
-            'description' => 'Deposit amount to your Kryptto.io Wallet',
+            'description' => 'Deposit amount to your LotteryCamp.com Wallet',
             'local_price' => [
                 'amount' => $this->currency->coinToBtc($coins),
                 'currency' => 'BTC',
