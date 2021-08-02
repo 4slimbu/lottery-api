@@ -12,7 +12,8 @@ Please copy the following code into the verify page of your app to confirm your 
     <strong>{{ $token }}</strong>
 </p>
 <br>
-You can start posting your ad on Lottery
+
+Once you verify, your limitations will be removed. Have fun!!
 
 Thanks,<br>
 {{ config('app.name') }}

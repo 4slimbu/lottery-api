@@ -4,7 +4,7 @@
     Hello,
 </h1>
 
-Welcome to Lottery App.
+Welcome to {{ config('app.name') }}.
 
 Please use the following code to verify your email address:
 <br>
