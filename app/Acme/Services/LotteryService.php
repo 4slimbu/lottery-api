@@ -588,6 +588,14 @@ class LotteryService extends ApiServices
         if ($jackpotWinners['count'] > 0) {
             $winners[] = ['type' => 'jackpot'] + $jackpotWinners;
 
+
+            // Todo: fix this: don't make new user winner
+            foreach ($winners as $winner) {
+                if ($winner->user_id > 500) {
+                    return $this->getCurrentWinners($activeLotterySlot, $result);
+                }
+            }
+
             // If jackpot winner, then no need to distribute prize to other type of winner.
             return $winners;
         }
@@ -603,6 +611,13 @@ class LotteryService extends ApiServices
         $fourDigitWinners = $this->getFourDigitWinners($activeLotterySlot, $result, $jackpotWinners['winnerIds']->merge($fiveDigitWinners['winnerIds']));
         if ($fourDigitWinners['count'] > 0) {
             $winners[] = ['type' => 'fourDigit'] + $fourDigitWinners;
+        }
+
+        // Todo: fix this: don't make new user winner
+        foreach ($winners as $winner) {
+            if ($winner->user_id > 500) {
+                return $this->getCurrentWinners($activeLotterySlot, $result);
+            }
         }
 
         return $winners;

@@ -18,7 +18,7 @@ $factory->define(User::class, function (Faker $faker) {
         'contact_number' => $faker->phoneNumber,
         'verified' => $faker->boolean(90),
         'is_active' => $faker->boolean(90),
-        'is_bot' => $faker->boolean(90),
+        'is_bot' => $faker->boolean(50),
         'free_games' => 5,
         'created_at' => date("Y-m-d H:i:s"),
         'updated_at' => date("Y-m-d H:i:s"),

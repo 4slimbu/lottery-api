@@ -32,6 +32,6 @@ class WalletTransactionEventListener implements ShouldQueue
      */
     public function handle(WalletTransactionEvent $event)
     {
-        Mail::to($event->user->email)->send(new WalletTransactionEmail($event->walletTransaction, $event->user));
+        //Mail::to($event->user->email)->send(new WalletTransactionEmail($event->walletTransaction, $event->user));
     }
 }
