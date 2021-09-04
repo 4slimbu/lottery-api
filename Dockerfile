@@ -1,5 +1,8 @@
 FROM php:7.2-fpm
 
+ARG USER_ID
+ARG USER
+
 # Copy composer.lock and composer.json
 COPY composer.lock composer.json /var/www/
 
@@ -33,17 +36,16 @@ RUN docker-php-ext-install gd
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Add user for laravel application
-RUN groupadd -g 1000 www
-RUN useradd -u 1000 -ms /bin/bash -g www www
+RUN useradd -u $USER_ID -ms /bin/bash -g www-data $USER
 
 # Copy existing application directory contents
 COPY . /var/www
 
 # Copy existing application directory permissions
-COPY --chown=www:www . /var/www
+COPY --chown=$USER:www-data . /var/www
 
 # Change current user to www
-USER www
+USER $USER
 
 # Expose port 9000 and start php-fpm server
 EXPOSE 9000

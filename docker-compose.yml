@@ -3,8 +3,10 @@ services:
   app:
     build:
       args:
-        user: sudip
-        uid: 1000
+        D_USER_ID: ${D_USER_ID}
+        D_USER: ${D_USER}
+        D_GROUP_ID: ${D_GROUP_ID}
+        D_GROUP: ${D_GROUP}
       context: ./
       dockerfile: Dockerfile
     image: limvus/lottery

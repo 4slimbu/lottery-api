@@ -36,7 +36,12 @@ return [
     'channels' => [
         'stack' => [
             'driver' => 'stack',
-            'channels' => ['single'],
+            'channels' => ['sentry', 'single'],
+        ],
+        'sentry' => [
+            'driver' => 'sentry',
+            'level' => null,
+            'bubble' => true,
         ],
 
         'single' => [
