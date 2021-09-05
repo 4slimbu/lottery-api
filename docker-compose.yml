@@ -62,8 +62,8 @@ services:
       - ./:/var/www
       - ./docker-compose/nginx:/etc/nginx/conf.d
     environment:
-      - VIRTUAL_HOST=api.lotterycamp.local
-      - LETSENCRYPT_HOST=api.lotterycamp.local
+      - VIRTUAL_HOST=${VIRTUAL_HOST}
+      - LETSENCRYPT_HOST=${LETSENCRYPT_HOST}
 
   redis:
     image: redis:alpine
