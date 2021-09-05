@@ -1,10 +1,9 @@
 FROM php:7.2-fpm
 
-ARG USER_ID
-ARG USER
-
-# Copy composer.lock and composer.json
-COPY composer.lock composer.json /var/www/
+ARG D_USER_ID
+ARG D_USER
+ARG D_GROUP_ID
+ARG D_GROUP
 
 # Set working directory
 WORKDIR /var/www
@@ -35,17 +34,29 @@ RUN docker-php-ext-install gd
 # Install composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-# Add user for laravel application
-RUN useradd -u $USER_ID -ms /bin/bash -g www-data $USER
+
+# Add group
+# If group exist and throws error, simply ignore it and move on
+RUN groupadd -f -g $D_GROUP_ID $D_GROUP
+
+# Add user if not exits
+RUN useradd -u $D_USER_ID -ms /bin/bash -g $D_GROUP $D_USER || echo "User already exists"
 
 # Copy existing application directory contents
-COPY . /var/www
-
+# use this if you want isolated filesystem -e.g: in production
+#
+# Here I am commenting this because we are mapping the current directory to working
+# directory and have also set the same user in .env file so there should not be any
+# permission related issue.
+#
+# COPY . /var/www
 # Copy existing application directory permissions
-COPY --chown=$USER:www-data . /var/www
+# COPY --chown=$D_USER:$D_GROUP . /var/www
 
-# Change current user to www
-USER $USER
+
+
+# Set current user
+USER $D_USER
 
 # Expose port 9000 and start php-fpm server
 EXPOSE 9000
